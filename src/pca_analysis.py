@@ -222,3 +222,28 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# Helper function - used in clustering script
+
+
+def run_pca(filepath: str, n_components: int = 2):
+
+    # Load data
+    df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
+
+    # Remove non-feature columns, convert to NumPy arrays, shape (n_samples, n_features)
+    update_df = df.drop(columns=["Sample_ID", "Class"])
+    features = update_df.values.astype(float)
+
+    # Get labels
+    y = df["Class"].map({2: 0, 4: 1}).values
+
+    # Standardise and run PCA
+    standardised = standardise_features(features)
+
+    _, eigenvectors_sorted = compute_pca(standardised)
+
+    # Multiply standardised data by first n_components eigenvectors
+    pca_scores = project_onto_pcs(standardised, eigenvectors_sorted, n_components)
+
+    return pca_scores, y

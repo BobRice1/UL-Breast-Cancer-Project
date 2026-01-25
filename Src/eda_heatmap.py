@@ -34,11 +34,9 @@ update_df = df.drop(columns=["Sample_ID", "Class"])
 corr_matrix = update_df.corr()
 
 # Create figure with two panels: left for text, right for heatmap
-fig, heatmap_panel = plt.subplots(1, 1, figsize=(7, 6))
+plt.figure(figsize=(7, 6))
 
-plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12)
-
-# Right heatmap panel (Pearson correlation matrix)
+# Heatmap - (Pearson correlation matrix)
 sns.heatmap(
     corr_matrix,
     annot=True,
@@ -47,9 +45,8 @@ sns.heatmap(
     square=True,
     linewidths=0.5,
     cbar_kws={"shrink": 0.8},
-    ax=heatmap_panel,
 )
-heatmap_panel.set_title("Feature Correlation Heatmap")
+plt.title("Feature Correlation Heatmap")
 
 plt.tight_layout()
 plt.savefig("Figures/FeatureCorrelationHeatmap.png", dpi=300, bbox_inches="tight")

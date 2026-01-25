@@ -5,6 +5,9 @@ The goal of this project is to build an understanding of the feature difference 
 ## Structure
 - `src/`
   - `data_loading.py` – shared data loading and cleaning
+  - `eda_heatmap.py` – script to generate correlation heatmap
+  - `pca_analysis.py` – PCA implementation and visualization
+  - `clustering_kmeans.py` – K-Means clustering implementation
 - `Data/`
   - `breast-cancer-wisconsin.data` – raw dataset from UCI
 - `Figures/`

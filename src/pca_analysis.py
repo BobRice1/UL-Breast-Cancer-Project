@@ -199,22 +199,22 @@ def main() -> None:
     df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
 
     # Build feature matrix X and label vector y
-    X_df: pd.DataFrame = df.drop(columns=["Sample_ID", "Class"])
-    X = X_df.values.astype(float)
-    y = df["Class"].map({2: 0, 4: 1}).values  # 0 = benign, 1 = malignant
+    feature_df: pd.DataFrame = df.drop(columns=["Sample_ID", "Class"])
+    feature_matrix = feature_df.values.astype(float)
+    target_labels = df["Class"].map({2: 0, 4: 1}).values  # 0 = benign, 1 = malignant
 
     # Standardise features
-    X_std = standardise_features(X)
+    features_std = standardise_features(feature_matrix)
 
     # PCA via eigen-decomposition
-    eigenvalues_sorted, eigenvectors_sorted = compute_pca(X_std)
+    eigenvalues_sorted, eigenvectors_sorted = compute_pca(features_std)
 
     # Variance plot (all components)
     plot_prob_of_variance(eigenvalues_sorted, highlight_components=(2, 3))
 
     # Project onto first two PCs and scatter plot
-    X_pca_2d = project_onto_pcs(X_std, eigenvectors_sorted, n_components=2)
-    plot_pca_scatter(X_pca_2d, y)
+    project_pca_2d = project_onto_pcs(features_std, eigenvectors_sorted, n_components=2)
+    plot_pca_scatter(project_pca_2d, target_labels)
 
     # Scree plot
     plot_scree(eigenvalues_sorted)

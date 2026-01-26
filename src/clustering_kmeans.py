@@ -118,9 +118,13 @@ label_to_name = {0: "Benign", 1: "Malignant"}
 cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters])
 
 # Plot the clustered data with centroids
+custom_palette = {"Benign": "blue", "Malignant": "red"}
 plt.figure(figsize=(10, 6))
 sns.scatterplot(
-    x=pca_scores_2D[:, 0], y=pca_scores_2D[:, 1], hue=cluster_names, palette="Set1"
+    x=pca_scores_2D[:, 0],
+    y=pca_scores_2D[:, 1],
+    hue=cluster_names,
+    palette=custom_palette,
 )
 plt.scatter(centroids[:, 0], centroids[:, 1], s=300, c="black", marker="X")
 plt.title("K-Means Clustering on PCA-Reduced Data", fontsize=20)

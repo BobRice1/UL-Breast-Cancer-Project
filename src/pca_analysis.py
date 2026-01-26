@@ -146,7 +146,7 @@ def plot_pca_scatter(
 
     plt.xlabel("PC1")
     plt.ylabel("PC2")
-    plt.title("PCA: PC1 vs PC2 (coloured by tumour class)")
+    plt.title("Principal Component Analysis: PC1 vs PC2")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")

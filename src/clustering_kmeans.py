@@ -1,65 +1,151 @@
 # K-Means Clustering Implementation and Evaluation using Adjusted Rand Index (ARI)
 
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import seaborn as sns
 
 from pca_analysis import run_pca
 
 
-# Compute Euclidean distance between two points (PC1, PC2)
-def euclidean_distance(point1, point2):
-    return np.sqrt(np.sum((point1 - point2) ** 2))
+def _squared_distances(data: np.ndarray, centroids: np.ndarray) -> np.ndarray:
+    """
+    Compute squared Euclidean distances from each data point to each centroid.
+    Returns array of shape (n_samples, k).
+    """
+    return ((data[:, None, :] - centroids[None, :, :]) ** 2).sum(axis=2)
 
 
-# Centroid initialisation to k random points from the dataset as the initial centroids
-def initialize_centroids(data, k):
-    indices = np.random.choice(data.shape[0], k, replace=False)
+def initialize_centroids_random(
+    data: np.ndarray, k: int, rng: np.random.Generator
+) -> np.ndarray:
+    """Randomly select k unique data points as initial centroids."""
+    indices = rng.choice(data.shape[0], size=k, replace=False)
     return data[indices].copy()
 
 
-# Assign each data point to the nearest centroid
-def assign_clusters(data, centroids):
-    clusters = []
-    for point in data:
-        distances = [euclidean_distance(point, centroid) for centroid in centroids]
-        clusters.append(np.argmin(distances))
-    return np.array(clusters)
+def initialize_centroids_kmeanspp(
+    data: np.ndarray, k: int, rng: np.random.Generator
+) -> np.ndarray:
+    """
+    k-means++ initialisation.
+    - Choose first centroid uniformly at random.
+    - Choose subsequent centroids with probability proportional to distance^2 to
+      the closest existing centroid.
+    """
+    n_samples = data.shape[0]
+    centroids = np.empty((k, data.shape[1]), dtype=float)
+
+    first_idx = rng.integers(0, n_samples)
+    centroids[0] = data[first_idx]
+
+    closest_d2 = ((data - centroids[0]) ** 2).sum(axis=1)
+    for c in range(1, k):
+        total = closest_d2.sum()
+        if total <= 0:
+            # All points identical (or numerical collapse): fall back to random picks
+            remaining = rng.choice(n_samples, size=(k - c), replace=False)
+            centroids[c:] = data[remaining]
+            break
+
+        probs = closest_d2 / total
+        next_idx = rng.choice(n_samples, p=probs)
+        centroids[c] = data[next_idx]
+        next_d2 = ((data - centroids[c]) ** 2).sum(axis=1)
+        closest_d2 = np.minimum(closest_d2, next_d2)
+
+    return centroids
 
 
 # Update centroids by calculating the mean of all points assigned to each cluster
-def update_centroids(data, clusters, k, old_centroids):
-    new_centroids = []
+def update_centroids(
+    data: np.ndarray,
+    clusters: np.ndarray,
+    k: int,
+    old_centroids: np.ndarray,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    new_centroids = np.empty_like(old_centroids, dtype=float)
+
     for i in range(k):
         cluster_points = data[clusters == i]
-
-        if len(cluster_points) == 0:
-            new_centroids.append(old_centroids[i])
+        if cluster_points.shape[0] == 0:
+            # Re-seed empty cluster to the point with largest current error
+            d2 = ((data - old_centroids[clusters]) ** 2).sum(axis=1)
+            new_centroids[i] = data[np.argmax(d2)]
         else:
-            new_centroids.append(cluster_points.mean(axis=0))
+            new_centroids[i] = cluster_points.mean(axis=0)
 
-    return np.array(new_centroids)
+    return new_centroids
 
 
-# K-Means algorithm implementation - assigning clusters and updating centroids iteratively
-def kmeans(data, k, max_iters=100, tol=1e-6):
-    centroids = initialize_centroids(data, k)
+def kmeans_single_run(
+    data: np.ndarray,
+    k: int,
+    *,
+    max_iters: int = 300,
+    tol: float = 1e-6,
+    init: str = "kmeans++",
+    rng: np.random.Generator,
+):
+    if init == "kmeans++":
+        centroids = initialize_centroids_kmeanspp(data, k, rng)
+    elif init == "random":
+        centroids = initialize_centroids_random(data, k, rng)
+    else:
+        raise ValueError("init must be 'kmeans++' or 'random'")
 
-    for _ in range(max_iters):
-        clusters = assign_clusters(data, centroids)
+    prev_inertia = None
+    for it in range(1, max_iters + 1):
+        d2 = _squared_distances(data, centroids)
+        clusters = np.argmin(d2, axis=1)
+        inertia = float(np.min(d2, axis=1).sum())
 
-        new_centroids = update_centroids(data, clusters, k, centroids)
+        centroids = update_centroids(data, clusters, k, centroids, rng)
 
-        if np.allclose(centroids, new_centroids, atol=tol):
-            centroids = new_centroids
-            break
+        if prev_inertia is not None:
+            rel_improvement = abs(prev_inertia - inertia) / max(prev_inertia, 1e-12)
+            if rel_improvement < tol:
+                break
+        prev_inertia = inertia
 
-        centroids = new_centroids
+    return centroids, clusters, inertia, it
 
-    return centroids, clusters
+
+def kmeans(
+    data: np.ndarray,
+    k: int,
+    *,
+    n_init: int = 20,
+    random_state: int = 0,
+    init: str = "kmeans++",
+    max_iters: int = 300,
+    tol: float = 1e-6,
+):
+    """
+    Run k-means with multiple random initialisations (restarts).
+    Returns the run with the lowest inertia.
+    """
+    rng = np.random.default_rng(random_state)
+
+    best = None
+    for _ in range(n_init):
+        centroids, clusters, inertia, n_iters = kmeans_single_run(
+            data,
+            k,
+            max_iters=max_iters,
+            tol=tol,
+            init=init,
+            rng=rng,
+        )
+        if best is None or inertia < best["inertia"]:
+            best = {
+                "centroids": centroids,
+                "clusters": clusters,
+                "inertia": inertia,
+                "n_iters": n_iters,
+            }
+
+    return best["centroids"], best["clusters"], best["inertia"], best["n_iters"]
 
 
 def n_choose_2(n):
@@ -99,60 +185,77 @@ def adjusted_rand_score(true_labels, cluster_labels):
 # assign k based on elbow method in pca_analysis.py, 2 optimal as 2 tumour classes present
 k = 2
 
+# k-means configuration (for reproducibility + robustness)
+RANDOM_STATE = 0
+N_INIT = 30
+INIT_METHOD = "kmeans++"  # 'kmeans++' or 'random'
+
 #ARI over multiple PCA component counts
 component_list = [2, 3, 5, 10]
 
 ari_results = {}
-best = {"n_components": None, "ari": -np.inf, "centroids": None, "clusters": None, "scores": None}
+best = {
+    "n_components": None,
+    "ari": -np.inf,
+    "centroids": None,
+    "clusters": None,
+    "scores": None,
+    "inertia": None,
+    "n_iters": None,
+}
 
 for n_comp in component_list:
     pca_scores, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=n_comp)
     
-    centroids, clusters = kmeans(pca_scores, k)
+    centroids, clusters, inertia, n_iters = kmeans(
+        pca_scores,
+        k,
+        n_init=N_INIT,
+        random_state=RANDOM_STATE,
+        init=INIT_METHOD,
+    )
 
     ari = adjusted_rand_score(y, clusters)
     ari_results[n_comp] = ari
 
-    print(f"n_components={n_comp:>2} ARI={ari:.3f}")
+    print(f"n_components={n_comp:>2} ARI={ari:.3f} inertia={inertia:.1f} iters={n_iters}")
     if ari > best["ari"]:
         best.update({
             "n_components": n_comp,
             "ari": ari,
             "centroids": centroids,
             "clusters": clusters,
-            "scores": pca_scores
+            "scores": pca_scores,
+            "inertia": inertia,
+            "n_iters": n_iters,
         })
 
 print(f"\nBest ARI={best['ari']:.3f} at n_components={best['n_components']}")
-# Call PCA function to reduce data to 2 dimensions, y used for cluster labelling only
-#pca_scores_2D, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=2)
 
-# Run K-Means clustering on PC1 and PC2
-#centroids, clusters = kmeans(pca_scores_2D, k)
-
-# Compute Adjusted Rand Index (ARI)
-#ari = adjusted_rand_score(y, clusters)
-#print(f"Adjusted Rand Index (ARI): {ari:.3f}")
+# Use the best result for plotting
+pca_scores_best = best["scores"]
+clusters_best = best["clusters"]
+centroids_best = best["centroids"]
 
 # Map cluster IDs to true labels for visualization - from 0 and 1 to Benign and Malignant
 cluster_to_label = {}
-for cid in np.unique(clusters):
-    majority_true = np.bincount(y[clusters == cid]).argmax()
+for cid in np.unique(clusters_best):
+    majority_true = np.bincount(y[clusters_best == cid]).argmax()
     cluster_to_label[cid] = majority_true
 
 label_to_name = {0: "Benign", 1: "Malignant"}
-cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters])
+cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters_best])
 
 # Plot the clustered data with centroids
 custom_palette = {"Benign": "blue", "Malignant": "red"}
 plt.figure(figsize=(10, 6))
 sns.scatterplot(
-    x=pca_scores_2D[:, 0],
-    y=pca_scores_2D[:, 1],
+    x=pca_scores_best[:, 0],
+    y=pca_scores_best[:, 1],
     hue=cluster_names,
     palette=custom_palette,
 )
-plt.scatter(centroids[:, 0], centroids[:, 1], s=300, c="black", marker="X")
+plt.scatter(centroids_best[:, 0], centroids_best[:, 1], s=300, c="black", marker="X")
 plt.title("K-Means Clustering on PCA-Reduced Data", fontsize=20)
 plt.xlabel("PC1")
 plt.ylabel("PC2")

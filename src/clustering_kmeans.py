@@ -90,6 +90,7 @@ def adjusted_rand_score(true_labels, cluster_labels):
 
     expected_index = (sum_comb_rows * sum_comb_cols) / total_combinations
     max_index = (sum_comb_rows + sum_comb_cols) / 2
+    
     ari = (sum_comb_c - expected_index) / (max_index - expected_index)
 
     return ari
@@ -98,15 +99,40 @@ def adjusted_rand_score(true_labels, cluster_labels):
 # assign k based on elbow method in pca_analysis.py, 2 optimal as 2 tumour classes present
 k = 2
 
+#ARI over multiple PCA component counts
+component_list = [2, 3, 5, 10]
+
+ari_results = {}
+best = {"n_components": None, "ari": -np.inf, "centroids": None, "clusters": None, "scores": None}
+
+for n_comp in component_list:
+    pca_scores, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=n_comp)
+    
+    centroids, clusters = kmeans(pca_scores, k)
+
+    ari = adjusted_rand_score(y, clusters)
+    ari_results[n_comp] = ari
+
+    print(f"n_components={n_comp:>2} ARI={ari:.3f}")
+    if ari > best["ari"]:
+        best.update({
+            "n_components": n_comp,
+            "ari": ari,
+            "centroids": centroids,
+            "clusters": clusters,
+            "scores": pca_scores
+        })
+
+print(f"\nBest ARI={best['ari']:.3f} at n_components={best['n_components']}")
 # Call PCA function to reduce data to 2 dimensions, y used for cluster labelling only
-pca_scores_2D, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=2)
+#pca_scores_2D, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=2)
 
 # Run K-Means clustering on PC1 and PC2
-centroids, clusters = kmeans(pca_scores_2D, k)
+#centroids, clusters = kmeans(pca_scores_2D, k)
 
 # Compute Adjusted Rand Index (ARI)
-ari = adjusted_rand_score(y, clusters)
-print(f"Adjusted Rand Index (ARI): {ari:.3f}")
+#ari = adjusted_rand_score(y, clusters)
+#print(f"Adjusted Rand Index (ARI): {ari:.3f}")
 
 # Map cluster IDs to true labels for visualization - from 0 and 1 to Benign and Malignant
 cluster_to_label = {}

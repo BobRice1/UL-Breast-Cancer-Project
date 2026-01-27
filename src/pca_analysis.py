@@ -52,6 +52,59 @@ def project_onto_pcs(
     return pca_scores
 
 
+def compute_loadings_df(
+    eigenvectors_sorted: np.ndarray,
+    feature_names: list[str],
+    n_components: int = 2,
+) -> pd.DataFrame:
+    # Select the first n_components eigenvectors
+    loadings = eigenvectors_sorted[:, :n_components]
+
+    # Create a DataFrame for better readability
+    loadings_df = pd.DataFrame(
+        loadings,
+        index=feature_names,
+        columns=[f"PC{i+1}" for i in range(n_components)],
+    )
+
+    return loadings_df
+
+
+def print_loadings(loadings_df: pd.DataFrame, pc: str = "PC1", top_n: int = 5) -> None:
+    # Sort loadings by absolute value for the specified principal component
+    sorted_loadings = loadings_df[pc]
+    top_positive = sorted_loadings.sort_values(ascending=False).head(top_n)
+    top_negative = sorted_loadings.sort_values(ascending=True).head(top_n)
+
+    print(f"\nTop + loadings for {pc}:")
+    print(top_positive.to_string())
+
+    print(f"\nTop - loadings for {pc}:")
+    print(top_negative.to_string())
+
+
+def plot_loadings_bar(
+    loadings_df: pd.DataFrame,
+    pc: str = "PC1",
+    top_n: int = 8,
+    output_path: str = "Figures/pca_loadings_pc1.png",
+) -> None:
+
+    s = loadings_df[pc].copy()
+
+    top_features = s.abs().sort_values(ascending=False).head(top_n).index
+    s = s.loc[top_features].sort_values()
+
+    plt.figure(figsize=(6, 4))
+    plt.barh(s.index, s.values, color="skyblue", alpha=0.8)
+    plt.title(f"Feature Loadings for {pc}")
+    plt.xlabel("Features")
+    plt.ylabel("Loading Value")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.show()
+
+
 # Plot with explained variance in percent and red lines marking cumulative variance at selected components.
 def plot_prob_of_variance(
     eigenvalues_sorted: np.ndarray,
@@ -218,6 +271,22 @@ def main() -> None:
 
     # Scree plot
     plot_scree(eigenvalues_sorted)
+
+    # Compute loadings DataFrame
+    feature_names = feature_df.columns.tolist()
+    loadings_df = compute_loadings_df(
+        eigenvectors_sorted, feature_names, n_components=2
+    )
+
+    print_loadings(loadings_df, pc="PC1", top_n=5)
+    print_loadings(loadings_df, pc="PC2", top_n=5)
+
+    plot_loadings_bar(
+        loadings_df, pc="PC1", top_n=8, output_path="Figures/pca_loadings_pc1.png"
+    )
+    plot_loadings_bar(
+        loadings_df, pc="PC2", top_n=8, output_path="Figures/pca_loadings_pc2.png"
+    )
 
 
 if __name__ == "__main__":

@@ -32,7 +32,8 @@ Here, we apply unsupervised dimensionality reduction and clustering to the Breas
 
 \paragraph{Correlation analysis:} To characterise feature dependencies, we computed the Pearson correlation matrix
 \begin{equation}
-C_{jk} = \frac{1}{N-1} \sum_{i=1}^{N} x_{ij} x_{ik}.
+    r_{jk} = \frac{\sum_{i=1}^{N} (x_{ij} - \bar{x}_j)(x_{ik} - \bar{x}_k)}
+    {\sqrt{\sum_{i=1}^{N}(x_{ij} - \bar{x}_j)^2 \,\sum_{i=1}^{N}(x_{ik} - \bar{x}_k)^2}}.
 \end{equation}
 Revealing strongly correlated groups of cytological features associated with malignancy. This motivated dimensionality reduction to capture dominant modes of variation. 
 

@@ -103,7 +103,7 @@ def plot_loadings_bar(
     s = s.loc[top_features].sort_values()
 
     plt.figure(figsize=(6, 4))
-    plt.barh(s.index, s.values, alpha=0.8)  # horizontal bar plot
+    plt.barh(s.index, s.values, alpha=0.8)  # bar plot
     plt.title(f"Feature Loadings for {pc}")
     plt.xlabel("Loading Value")
     plt.ylabel("Features")

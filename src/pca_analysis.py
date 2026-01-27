@@ -298,7 +298,7 @@ if __name__ == "__main__":
 def run_pca(filepath: str, n_components: int = 2):
 
     # Load data
-    df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
+    df = load_breast_cancer_data(filepath)
 
     # Remove non-feature columns, convert to NumPy arrays, shape (n_samples, n_features)
     update_df = df.drop(columns=["Sample_ID", "Class"])

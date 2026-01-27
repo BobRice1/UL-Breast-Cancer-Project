@@ -279,7 +279,7 @@ def main() -> None:
     # Scree plot
     plot_scree(eigenvalues_sorted)
 
-    # Compute and display feature loadings
+    # Compute and display feature loadingsgig
     feature_names = feature_df.columns.tolist()
     loadings_df = compute_loadings_df(
         eigenvectors_sorted, feature_names, n_components=2

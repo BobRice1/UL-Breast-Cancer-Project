@@ -19,4 +19,123 @@ Unsupervised learning methods offer a systematic approach to uncover latent stru
 \end{abstract}
 \maketitle
 
+\section{Introduction}
+Breast cancer diagnosis relies on quantitative analysis of cytological morphology, where systematic differences in cell size, shape, and nuclear properties are indicative of malignancy~\cite{Wolberg1990}. Advances in digital cytology have enabled the extraction of high-dimensional feature representations from tumour samples~\cite{Street1993}, motivating data-driven approaches to explore structure within tumour populations beyond individual features.
+
+While supervised learning methods have achieved high diagnostic accuracy, understanding the intrinsic organisation of tumour data without reference to class labels remains important for exploratory analysis and interpretability. Unsupervised methods offer a complementary perspective by probing whether clinically relevant structure emerges directly from statistical regularities in the feature space. Principal component analysis (PCA) provides a natural tool for this purpose, identifying dominant directions of shared variance that often correspond to biologically meaningful combinations of correlated features~\cite{Jolliffe2002}. Clustering methods applied in reduced representations can further expose intrinsic groupings, enabling comparison with known diagnostic categories without explicit supervision~\cite{MacQueen1967,Hastie2009}.
+
+Here, we apply unsupervised dimensionality reduction and clustering to the Breast Cancer Wisconsin dataset to investigate whether benign and malignant tumours occupy distinct regions of feature space. We show that correlated cytological features give rise to a low-dimensional structure in which the two diagnostic classes are partially separable, despite the absence of labels during training. These results demonstrate that dominant axes of variance in cytological feature space capture clinically meaningful morphological distinctions, highlighting the utility of simple unsupervised approaches for structure discovery in biomedical data.
+
+
+\section{Methods}
+\paragraph{Dataset and preprocessing:} We analysed the Breast Cancer Wisconsin cytology dataset, comprising 569 samples characterised by D = 30 morphological and nuclear features extracted from breast tissue samples. Features were standardised to zero mean and unit variance prior to analysis,
+
+\paragraph{Correlation analysis:} To characterise feature dependencies, we computed the Pearson correlation matrix
+\begin{equation}
+C_{jk} = \frac{1}{N-1} \sum_{i=1}^{N} x_{ij} x_{ik}.
+\end{equation}
+Revealing strongly correlated groups of cytological features associated with malignancy. This motivated dimensionality reduction to capture dominant modes of variation. 
+
+\paragraph{Principal component analysis:} Dimensionality reduction was performed using principal component analysis (PCA). The covariance matrix
+\begin{equation}
+\Sigma = \frac{1}{N-1} X^{\mathsf{T}} X ,
+\end{equation}
+was diagonalised by solving the eigenvalue problem
+\begin{equation}
+\Sigma \mathbf{v}_{\ell} = \lambda_{\ell} \mathbf{v}_{\ell}, 
+\end{equation}
+where $\lambda_{\ell}$ and $\mathbf{v}_{\ell}$ denotes the eigenvalues and corresponding eigenvectors, ordered such that $\lambda_{1} \geq \lambda_{2} \geq \dots$.
+Each data point $\mathbf{x}_i$ was projected onto the first $K$ principal components via
+\begin{equation}
+\mathbf{z}_i = V_K^{\mathsf{T}} \mathbf{x}_i ,
+\end{equation}
+where $V_K = [\mathbf{v}_1, \dots, \mathbf{v}_K]$. The number of retained components was chosen based on the cumulative explained variance.
+
+\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minimising the within-cluster sum of squared distances,
+\begin{equation}
+\mathcal{L} = \sum_{i=1}^{N} \min_{k} \left\lVert \mathbf{z}_i - \boldsymbol{\mu}_k \right\rVert^{2}.
+\end{equation}
+The number of clusters was fixed to $k=2$, corresponding to the expected benign and malignant tumour classes, though no diagnostic label information was used during clustering.
+
+\paragraph{Evaluation:} Clustering performance was quantified post hoc using the adjusted Rand index (ARI), defined as
+\begin{equation}
+\mathrm{ARI} =
+\frac{\mathrm{RI} - \mathbb{E}[\mathrm{RI}]}
+{\max(\mathrm{RI}) - \mathbb{E}[\mathrm{RI}]},
+\end{equation}
+which measures agreement between inferred cluster assignments and reference diagnostic labels while correcting for chance. An ARI value close to unity indicates strong agreement.
+
+\section{Results}
+
+Strong correlations are observed among multiple cytological features, particularly those related to cell size and shape (Fig.~\ref{fig:correlation}). Pairwise Pearson correlation coefficients among size- and shape-related features frequently exceed $r \approx 0.7$, indicating substantial redundancy in the original feature space. In contrast, features associated with mitotic activity and nuclear texture exhibit weaker correlations with other variables ($r \lesssim 0.5$), suggesting partially independent sources of variability. These correlation patterns indicate that much of the variance in the data is shared across a subset of morphological features.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{PearsonCorrelationMatrix.png}
+\caption{Pearson correlation matrix of cytological features in the Breast Cancer Wisconsin dataset. Strong correlations among size- and shape-related features indicate a shared morphological abnormality axis.}
+\label{fig:correlation}
+\end{figure}
+
+Principal component analysis reveals a rapidly decaying eigenvalue spectrum (Fig.~\ref{fig:variance}). The first principal component accounts for approximately $65\%$ of the total variance, with the second contributing an additional $9\%$, such that the first two components together explain $74\%$ of the variance. Including a third component increases the cumulative explained variance to approximately $80\%$. Inspection of the PCA loadings shows that the first component is dominated by size- and shape-related features, including clump thickness and uniformity measures, while the second component receives stronger contributions from nuclear texture features such as bare nuclei and chromatin properties. This indicates that the dominant variance reflects a shared morphological abnormality axis, with secondary variation associated with nuclear structure.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pca_scree.png}
+\includegraphics[width=\linewidth]{pca_variance.png}
+\caption{(a) Scree plot showing the eigenvalue spectrum of the principal components. (b) Individual and cumulative variance explained as a function of the number of retained components. The first two components capture approximately $74\%$ of the total variance, increasing to $80\%$ when three components are included.}
+\label{fig:variance}
+\end{figure}
+
+Projection of tumour samples onto the first two principal components reveals partial separation between benign and malignant classes (Fig.~\ref{fig:scatter}). Although substantial overlap remains, the two classes occupy distinct regions of the reduced feature space, with separation occurring primarily along the first principal component. This demonstrates that unsupervised dimensionality reduction alone recovers diagnostically relevant structure, despite the absence of class labels during training.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pca_scatter.png}
+\caption{Projection of tumour samples onto the first two principal components. Points are coloured by tumour class for visualisation only; class labels were not used during training. Partial separation is observed primarily along the first principal component.}
+\label{fig:scatter}
+\end{figure}
+
+Clustering performed in the space of the first two principal components yields two dominant groupings separated predominantly along PC1 (Fig.~\ref{fig:kmeans}). The inferred cluster centroids are displaced along the axis associated with size- and shape-related cytological features, consistent with the interpretation of PC1 as a morphological abnormality axis. Despite the absence of supervision, the resulting cluster assignments show strong quantitative agreement with diagnostic labels, yielding an adjusted Rand index of $\mathrm{ARI} = 0.84$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{K-means_pca.png}
+\caption{K-means clustering of tumour samples in the space of the first two principal components. Points are coloured according to inferred cluster assignment, and crosses denote cluster centroids. Diagnostic labels are shown for visualisation only.}
+\label{fig:kmeans}
+\end{figure}
+
+
+
+
+\section{Conclusion}
+We have shown that unsupervised analysis of breast cancer cytological data reveals a low-dimensional structure that aligns closely with pathological distinctions between benign and malignant tumours. Principal component analysis identifies dominant axes of variance driven primarily by correlated size- and shape-related features, capturing the majority of variability in the dataset. Clustering performed in this reduced representation recovers two principal groupings that show strong agreement with diagnostic labels, despite the absence of supervision during training.
+Although substantial overlap between classes remains, reflecting biological variability and measurement noise, the emergence of partial separation indicates that key pathological information is encoded directly in the statistical structure of the feature space. These results demonstrate that simple unsupervised pipelines can recover clinically meaningful organisation from high-dimensional biomedical data and provide a useful framework for exploratory analysis when labels are limited or uncertain. Future work incorporating richer feature representations or spatial and temporal information may further enhance structure discovery and interpretability in tumour datasets.
+
+
+\begin{thebibliography}{9}
+\bibitem{Wolberg1990}
+W. H. Wolberg, O. L. Mangasarian,
+Multisurface method of pattern separation for medical diagnosis applied to breast cytology,
+Proc. Natl. Acad. Sci. U.S.A. 87, 9193 (1990).
+\bibitem{Street1993}
+W. N. Street, W. H. Wolberg, and O. L. Mangasarian,
+Nuclear feature extraction for breast tumor diagnosis,
+Proc. IS\&T/SPIE Symp. Electronic Imaging: Science and Technology \textbf{1905}, 861 (1993).
+\bibitem{Jolliffe2002}
+I. T. Jolliffe,
+\textit{Principal Component Analysis},
+(Springer, New York, 2002).
+\bibitem{MacQueen1967}
+J. MacQueen,
+Some methods for classification and analysis of multivariate observations,
+in \textit{Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability}
+(University of California Press, Berkeley, 1967), pp. 281–297.
+\bibitem{Hastie2009}
+T. Hastie, R. Tibshirani, and J. Friedman,
+\textit{The Elements of Statistical Learning},
+(Springer, New York, 2009).
+
+
+\end{thebibliography}
+
 \end{document}

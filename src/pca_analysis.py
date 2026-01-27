@@ -213,8 +213,8 @@ def main() -> None:
     plot_prob_of_variance(eigenvalues_sorted, highlight_components=(2, 3))
 
     # Project onto first two PCs and scatter plot
-    project_pca_2d = project_onto_pcs(features_std, eigenvectors_sorted, n_components=2)
-    plot_pca_scatter(project_pca_2d, target_labels)
+    pca_scores_2d = project_onto_pcs(features_std, eigenvectors_sorted, n_components=2)
+    plot_pca_scatter(pca_scores_2d, target_labels)
 
     # Scree plot
     plot_scree(eigenvalues_sorted)

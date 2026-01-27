@@ -52,7 +52,6 @@ def project_onto_pcs(
     return pca_scores
 
 
-# Compute how much each feature contributes to each principal component
 def compute_loadings_df(
     eigenvectors_sorted: np.ndarray,
     feature_names: list[str],
@@ -71,11 +70,9 @@ def compute_loadings_df(
     return loadings_df
 
 
-# Print top positive and negative loadings (most important features) for a given principal component
 def print_loadings(loadings_df: pd.DataFrame, pc: str = "PC1", top_n: int = 5) -> None:
     # Sort loadings by absolute value for the specified principal component
     sorted_loadings = loadings_df[pc]
-    # Get top positive and negative contributors
     top_positive = sorted_loadings.sort_values(ascending=False).head(top_n)
     top_negative = sorted_loadings.sort_values(ascending=True).head(top_n)
 
@@ -86,7 +83,6 @@ def print_loadings(loadings_df: pd.DataFrame, pc: str = "PC1", top_n: int = 5) -
     print(top_negative.to_string())
 
 
-# Bar plot to visualise most important feature loadings for a given principal component
 def plot_loadings_bar(
     loadings_df: pd.DataFrame,
     pc: str = "PC1",
@@ -94,19 +90,16 @@ def plot_loadings_bar(
     output_path: str = "Figures/pca_loadings_pc1.png",
 ) -> None:
 
-    # Select loadings for the specified principal component
     s = loadings_df[pc].copy()
 
-    # Get top_n features by absolute loading value
     top_features = s.abs().sort_values(ascending=False).head(top_n).index
-    # Select and sort these features for plotting
     s = s.loc[top_features].sort_values()
 
     plt.figure(figsize=(6, 4))
-    plt.barh(s.index, s.values, alpha=0.8)  # horizontal bar plot
+    plt.barh(s.index, s.values, color="skyblue", alpha=0.8)
     plt.title(f"Feature Loadings for {pc}")
-    plt.xlabel("Loading Value")
-    plt.ylabel("Features")
+    plt.xlabel("Features")
+    plt.ylabel("Loading Value")
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.show()
@@ -279,7 +272,7 @@ def main() -> None:
     # Scree plot
     plot_scree(eigenvalues_sorted)
 
-    # Compute and display feature loadingsgig
+    # Compute and display feature loadings
     feature_names = feature_df.columns.tolist()
     loadings_df = compute_loadings_df(
         eigenvectors_sorted, feature_names, n_components=2

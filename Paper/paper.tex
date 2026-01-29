@@ -35,7 +35,8 @@ Here, we apply unsupervised learning methods to the Breast Cancer Wisconsin (Ori
     r_{jk} = \frac{\sum_{i=1}^{N} (x_{ij} - \bar{x}_j)(x_{ik} - \bar{x}_k)}
     {\sqrt{\sum_{i=1}^{N}(x_{ij} - \bar{x}_j)^2 \,\sum_{i=1}^{N}(x_{ik} - \bar{x}_k)^2}}.
 \end{equation}
-where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Strong correlations among multiple size- and shape-related features indicate substantial redundancy in the original feature space, motivating dimensionality reduction to capture dominant modes of shared morphological variation.
+where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Strong correlations among multiple features indicate 
+shared morphological information and motivate dimensionality reduction, as correlated features contribute to overlapping variance. Therefore, this correlation analysis provides both s statistical and biological basis for subsequent application of PCA.  
 \paragraph{Principal component analysis:} Dimensionality reduction was performed using principal component analysis (PCA), fit to the standardised feature matrix without access to diagnostic labels. PCA was chosen due to its interpretability and its ability to identify dominant correlated directions in linear feature spaces. Following standardisation to zero mean and unit variance, the sample covariance matrix
 \begin{equation}
 \Sigma = \frac{1}{N-1} X^{\mathsf{T}} X ,

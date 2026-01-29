@@ -7,37 +7,40 @@ import seaborn as sns
 from pca_analysis import run_pca
 
 
+# Compute squared Euclidean distances between data points and centroids
 def _squared_distances(data: np.ndarray, centroids: np.ndarray) -> np.ndarray:
-    """
-    Compute squared Euclidean distances from each data point to each centroid.
-    Returns array of shape (n_samples, k).
-    """
+
+    # Returns a (n_samples, n_centroids) array of squared distances
     return ((data[:, None, :] - centroids[None, :, :]) ** 2).sum(axis=2)
 
 
+# Initialize centroids by randomly selecting k unique data points
 def initialize_centroids_random(
     data: np.ndarray, k: int, rng: np.random.Generator
 ) -> np.ndarray:
-    """Randomly select k unique data points as initial centroids."""
+
     indices = rng.choice(data.shape[0], size=k, replace=False)
     return data[indices].copy()
 
 
+# Initialize centroids using k-means++ method
 def initialize_centroids_kmeanspp(
     data: np.ndarray, k: int, rng: np.random.Generator
 ) -> np.ndarray:
     """
-    k-means++ initialisation.
     - Choose first centroid uniformly at random.
     - Choose subsequent centroids with probability proportional to distance^2 to
       the closest existing centroid.
     """
+    # Initialize centroids array
     n_samples = data.shape[0]
     centroids = np.empty((k, data.shape[1]), dtype=float)
 
+    # Choose the first centroid randomly
     first_idx = rng.integers(0, n_samples)
     centroids[0] = data[first_idx]
 
+    # Choose remaining centroids
     closest_d2 = ((data - centroids[0]) ** 2).sum(axis=1)
     for c in range(1, k):
         total = closest_d2.sum()
@@ -78,6 +81,7 @@ def update_centroids(
     return new_centroids
 
 
+# Run a single k-means clustering
 def kmeans_single_run(
     data: np.ndarray,
     k: int,
@@ -94,6 +98,7 @@ def kmeans_single_run(
     else:
         raise ValueError("init must be 'kmeans++' or 'random'")
 
+    # K-means main loop
     prev_inertia = None
     for it in range(1, max_iters + 1):
         d2 = _squared_distances(data, centroids)
@@ -111,6 +116,7 @@ def kmeans_single_run(
     return centroids, clusters, inertia, it
 
 
+# Run k-means with multiple random initialisations (restarts).
 def kmeans(
     data: np.ndarray,
     k: int,
@@ -121,12 +127,10 @@ def kmeans(
     max_iters: int = 300,
     tol: float = 1e-6,
 ):
-    """
-    Run k-means with multiple random initialisations (restarts).
-    Returns the run with the lowest inertia.
-    """
+    # Set up random number generator
     rng = np.random.default_rng(random_state)
 
+    # Keep track of best solution found
     best = None
     for _ in range(n_init):
         centroids, clusters, inertia, n_iters = kmeans_single_run(
@@ -145,9 +149,11 @@ def kmeans(
                 "n_iters": n_iters,
             }
 
+    # Return best solution found with lowest inertia
     return best["centroids"], best["clusters"], best["inertia"], best["n_iters"]
 
 
+# Helper function to compute n choose 2
 def n_choose_2(n):
     return n * (n - 1) // 2
 
@@ -176,7 +182,7 @@ def adjusted_rand_score(true_labels, cluster_labels):
 
     expected_index = (sum_comb_rows * sum_comb_cols) / total_combinations
     max_index = (sum_comb_rows + sum_comb_cols) / 2
-    
+
     ari = (sum_comb_c - expected_index) / (max_index - expected_index)
 
     return ari
@@ -190,7 +196,7 @@ RANDOM_STATE = 0
 N_INIT = 30
 INIT_METHOD = "kmeans++"  # 'kmeans++' or 'random'
 
-#ARI over multiple PCA component counts
+# ARI over multiple PCA component counts
 component_list = [2, 3, 5, 10]
 
 ari_results = {}
@@ -206,7 +212,7 @@ best = {
 
 for n_comp in component_list:
     pca_scores, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=n_comp)
-    
+
     centroids, clusters, inertia, n_iters = kmeans(
         pca_scores,
         k,
@@ -218,17 +224,21 @@ for n_comp in component_list:
     ari = adjusted_rand_score(y, clusters)
     ari_results[n_comp] = ari
 
-    print(f"n_components={n_comp:>2} ARI={ari:.3f} inertia={inertia:.1f} iters={n_iters}")
+    print(
+        f"n_components={n_comp:>2} ARI={ari:.3f} inertia={inertia:.1f} iters={n_iters}"
+    )
     if ari > best["ari"]:
-        best.update({
-            "n_components": n_comp,
-            "ari": ari,
-            "centroids": centroids,
-            "clusters": clusters,
-            "scores": pca_scores,
-            "inertia": inertia,
-            "n_iters": n_iters,
-        })
+        best.update(
+            {
+                "n_components": n_comp,
+                "ari": ari,
+                "centroids": centroids,
+                "clusters": clusters,
+                "scores": pca_scores,
+                "inertia": inertia,
+                "n_iters": n_iters,
+            }
+        )
 
 print(f"\nBest ARI={best['ari']:.3f} at n_components={best['n_components']}")
 

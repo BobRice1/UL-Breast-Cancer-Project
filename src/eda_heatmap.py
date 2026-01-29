@@ -31,13 +31,13 @@ df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
 update_df = df.drop(columns=["Sample_ID", "Class"])
 
 # Compute correlation matrix
-corr_matrix = update_df.corr()
+corr_matrix = update_df.corr(method="pearson")
 
 # Create a figure
 plt.figure(figsize=(6, 6))
 
 
-# Create a heatmap (Pearson correlation matrix)
+# Create a heatmap of the correlation matrix
 sns.heatmap(
     corr_matrix,
     annot=True,

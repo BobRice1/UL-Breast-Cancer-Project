@@ -27,11 +27,7 @@ def initialize_centroids_random(
 def initialize_centroids_kmeanspp(
     data: np.ndarray, k: int, rng: np.random.Generator
 ) -> np.ndarray:
-    """
-    - Choose first centroid uniformly at random.
-    - Choose subsequent centroids with probability proportional to distance^2 to
-      the closest existing centroid.
-    """
+
     # Initialize centroids array
     n_samples = data.shape[0]
     centroids = np.empty((k, data.shape[1]), dtype=float)
@@ -197,7 +193,8 @@ N_INIT = 30
 INIT_METHOD = "kmeans++"  # 'kmeans++' or 'random'
 
 # ARI over multiple PCA component counts
-component_list = [2, 3, 5, 10]
+N_FEATURES = 9
+component_list = [2, 3, 5, N_FEATURES]
 
 ari_results = {}
 best = {

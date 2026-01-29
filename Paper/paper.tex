@@ -16,7 +16,7 @@
 \affiliation{School of Physics and Astronomy, University of Nottingham, UK}
 
 \begin{abstract}
-Unsupervised learning methods provide a principled framework for uncovering latent structure in biomedical data without reliance on diagnostic labels. We analyse the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by k-means clustering to assess whether benign and malignant tumours exhibit intrinsic separation based on cytological feature statistics alone. Correlation analysis reveals strong dependencies among size- and shape-related features, motivating dimensionality reduction. PCA shows that the first two components capture approximately $74\%$ of the total variance ($80\%$ with three components), reflecting a low-dimensional structure dominated by shared morphological variation. Clustering in this reduced representation yields strong alignment between unsupervised clusters and diagnostic labels, achieving an adjusted Rand index of $0.84$. Agreement with labels was assessed, post hoc. Although substantial overlap remains, these results demonstrate that correlated cytological features encode diagnostically relevant information, highlighting the utility of simple unsupervised approaches for exploratory structure discovery in biomedical data.
+Unsupervised learning methods provide a principled framework for uncovering latent structure in biomedical data without reliance on diagnostic labels. We analyse the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by $k$-means clustering to assess whether benign and malignant tumours exhibit intrinsic separation based on cytological feature statistics alone. Correlation analysis reveals strong dependencies among size- and shape-related features, motivating dimensionality reduction. PCA shows that the first two components capture approximately $74\%$ of the total variance ($80\%$ with three components), reflecting a low-dimensional structure dominated by shared morphological variation. Clustering in this reduced representation yields strong alignment between unsupervised clusters and diagnostic labels, achieving an adjusted Rand index of $0.84$. Agreement with labels was assessed, post hoc. Although substantial overlap remains, these results demonstrate that correlated cytological features encode diagnostically relevant information, highlighting the utility of simple unsupervised approaches for exploratory structure discovery in biomedical data.
 \end{abstract}
 
 \maketitle
@@ -49,11 +49,12 @@ where $\lambda_{\ell}$ and $\mathbf{v}_{\ell}$ denote the eigenvalues and corres
 \mathbf{z}_i = V_K^{\mathsf{T}} \mathbf{x}_i ,
 \end{equation}
 where $V_K = [\mathbf{v}_1, \dots, \mathbf{v}_K]$. The number of retained components was selected based on the cumulative explained variance and inspection of the eigenvalue spectrum.
-\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minimising the within-cluster sum of squared distances,
+\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. 
 \begin{equation}
 \mathcal{L} = \sum_{i=1}^{N} \min_{k} \left\lVert \mathbf{z}_i - \boldsymbol{\mu}_k \right\rVert^{2}.
 \end{equation}
-The number of clusters was fixed to $k=2$, corresponding to the expected benign and malignant tumour classes, although no diagnostic label information was used during clustering.
+Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minimising the within-cluster sum of squared distances (inertia). The number of clusters was fixed to $k=2$, and because $k$-means is sensitive to initial centroid placement and can converge to local minima, we used $k$-means++ initialisation with $30$ random restarts (fixed seed) and retained the minimum-inertia solution.
+
 \paragraph{Evaluation:} Clustering performance was assessed post hoc using the adjusted Rand index (ARI), 
 \begin{equation}
 \mathrm{ARI} =
@@ -98,12 +99,12 @@ Clustering performed in the space of the first two principal components yields t
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{K-means_pca.png}
-\caption{K-means clustering of tumour samples in the space of the first two principal components. Points are coloured by inferred cluster assignment, and crosses denote cluster centroids. Diagnostic labels are shown for visualisation only.}
+\caption{$K$-means clustering of tumour samples in the space of the first two principal components. Points are coloured by inferred cluster assignment, and crosses denote cluster centroids. Diagnostic labels are shown for visualisation only.}
 \label{fig:kmeans}
 \end{figure}
 \begin{table}[t]
 \centering
-\caption{Adjusted Rand Index (ARI) between k-means cluster assignments and diagnostic labels as a function of the number of retained principal components. For each configuration, the reported ARI corresponds to the solution with minimum inertia over 30 random initialisations using k-means++ initialisation and a fixed random seed.}
+\caption{Adjusted Rand Index (ARI) between $k$-means cluster assignments and diagnostic labels as a function of the number of retained principal components. For each configuration, the reported ARI corresponds to the solution with minimum inertia over 30 random initialisations using $k$-means++ initialisation and a fixed random seed.}
 \label{tab:ari}
 \begin{ruledtabular}
 \begin{tabular}{ccccc}

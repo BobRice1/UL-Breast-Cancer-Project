@@ -35,8 +35,8 @@ Here, we apply unsupervised learning methods to the Breast Cancer Wisconsin (Ori
     r_{jk} = \frac{\sum_{i=1}^{N} (x_{ij} - \bar{x}_j)(x_{ik} - \bar{x}_k)}
     {\sqrt{\sum_{i=1}^{N}(x_{ij} - \bar{x}_j)^2 \,\sum_{i=1}^{N}(x_{ik} - \bar{x}_k)^2}}.
 \end{equation}
-where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Strong correlations among multiple features indicate shared morphological information and overlapping variance. The Pearson correlation analysis therefore provides both a statistical and biological basis for subsequent application of PCA.   
-\paragraph{Principal component analysis:} Dimensionality reduction was performed using principal component analysis (PCA), fit to the standardised feature matrix without access to diagnostic labels. PCA was chosen due to its interpretability and its ability to identify dominant correlated directions in linear feature spaces. Following standardisation to zero mean and unit variance, the sample covariance matrix
+where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Strong inter-feature correlations, quantified using Pearson coefficients to capture linear dependencies, were used to assess feature redundancy and motivate subsequent application of PCA.
+\paragraph{Principal component analysis:} Dimensionality reduction was performed using PCA fit to the standardised feature matrix without access to diagnostic labels. PCA was chosen due to its interpretability and its ability to identify dominant correlated directions in linear feature spaces. Following standardisation to zero mean and unit variance, the sample covariance matrix
 \begin{equation}
 \Sigma = \frac{1}{N-1} X^{\mathsf{T}} X ,
 \end{equation}
@@ -49,7 +49,7 @@ where $\lambda_{\ell}$ and $\mathbf{v}_{\ell}$ denote the eigenvalues and corres
 \mathbf{z}_i = V_K^{\mathsf{T}} \mathbf{x}_i ,
 \end{equation}
 where $V_K = [\mathbf{v}_1, \dots, \mathbf{v}_K]$. The number of retained components was selected based on the cumulative explained variance and inspection of the eigenvalue spectrum.
-\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minimising the within-cluster sum of squared distances,
+\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. Given cluster centroids $\boldsymbol{\mu}_k$, sample assignments were obtained by minimising the within-cluster sum of squared distances,
 \begin{equation}
 \mathcal{L} = \sum_{i=1}^{N} \min_{k} \left\lVert \mathbf{z}_i - \boldsymbol{\mu}_k \right\rVert^{2}.
 \end{equation}

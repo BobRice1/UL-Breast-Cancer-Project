@@ -34,7 +34,7 @@ update_df = df.drop(columns=["Sample_ID", "Class"])
 corr_matrix = update_df.corr()
 
 # Create a figure
-plt.figure(figsize=(7, 6))
+plt.figure(figsize=(6, 6))
 
 
 # Create a heatmap (Pearson correlation matrix)

@@ -13,7 +13,8 @@ The goal of this project is to build an understanding of the feature difference 
 - `Figures/`
   - Saved figures to be used in the report
 - `paper/`
-  - to be added
+  - `paper.tex` - Latex Version
+  - `paper.pdf` - pdf Version
  
 ## Data loading
 

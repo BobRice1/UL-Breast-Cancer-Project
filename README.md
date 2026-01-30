@@ -25,28 +25,28 @@ from src.data_loading import load_breast_cancer_data
 
 df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
 
-`
+```
 
 ## Requirements
 
 Install the Python dependencies needed to run the scripts and regenerate figures:
 
-`ash
+```python
 pip install -r requirements.txt
-`
+```
 
 Or install directly:
 
-`ash
+```python
 pip install numpy pandas matplotlib seaborn
-`
+```
 
 ## Running the scripts (re-generate figures)
 
 From the project root:
 
-`ash
+```bash
 python src/eda_heatmap.py
 python src/pca_analysis.py
 python src/clustering_kmeans.py
-`
+```

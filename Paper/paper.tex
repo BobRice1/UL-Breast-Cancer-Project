@@ -49,13 +49,13 @@ where $\lambda_{\ell}$ and $\mathbf{v}_{\ell}$ denote the eigenvalues and corres
 \mathbf{z}_i = V_K^{\mathsf{T}} \mathbf{x}_i ,
 \end{equation}
 where $V_K = [\mathbf{v}_1, \dots, \mathbf{v}_K]$. The number of retained components was selected based on the cumulative explained variance and inspection of the eigenvalue spectrum.
-\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm. Given cluster centroids $\boldsymbol{\mu}_k$, sample assignments were obtained by minimising the within-cluster sum of squared distances,
+\paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm.
 \begin{equation}
 \mathcal{L} = \sum_{i=1}^{N} \min_{k} \left\lVert \mathbf{z}_i - \boldsymbol{\mu}_k \right\rVert^{2}.
 \end{equation}
-Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minimising the within-cluster sum of squared distances (inertia). The number of clusters was fixed to $k=2$, and because $k$-means is sensitive to initial centroid placement and can converge to local minima, we used $k$-means++ initialisation with $30$ random restarts (fixed seed) and retained the minimum-inertia solution.
+Given cluster centroids $\boldsymbol{\mu}_k$, sample assignments were obtained by minimising the sum of squared distances to the nearest centroid. The number of clusters was fixed to $k=2$, and because $k$-means is sensitive to initial centroid placement and can converge to local minima, we used $k$-means++ initialisation with $30$ random restarts (fixed seed) and retained the minimum-inertia solution.
 
-\paragraph{Evaluation:} Clustering performance was assessed post hoc using the adjusted Rand index (ARI), 
+\paragraph{Evaluation:}Clustering performance was assessed post hoc using the adjusted Rand index (ARI), 
 \begin{equation}
 \mathrm{ARI} =
 \frac{\mathrm{RI} - \mathbb{E}[\mathrm{RI}]}
@@ -64,42 +64,38 @@ Given cluster centroids $\boldsymbol{\mu}_k$, assignments were obtained by minim
 which quantifies agreement between inferred cluster assignments and reference diagnostic labels while correcting for chance. An ARI value close to unity indicates strong agreement.
 
 \section{Results}
-
-Strong correlations are observed among multiple cytological features, particularly those related to cell size and shape (Fig.~\ref{fig:correlation}). Pairwise Pearson correlation coefficients among size- and shape-related features frequently exceed $r \approx 0.7$, indicating substantial redundancy in the original ordinal feature space. In contrast, features associated with mitotic activity and nuclear characteristics exhibit weaker correlations with other variables ($r \lesssim 0.5$), suggesting partially independent sources of variability. These correlation patterns indicate that a large fraction of the variance in the dataset is shared across a subset of morphologically related features. This strongly correlated feature block underlies the dominance of first principal component, which alone accounts for  $65\%$ of the total variance.
+Strong correlations are observed among multiple cytological features, particularly those related to cell size and shape (Fig.~\ref{fig:correlation}). Pairwise Pearson correlation coefficients among these features frequently exceed $r \approx 0.7$, indicating substantial redundancy in the ordinal feature space. In contrast, features associated with mitotic activity and nuclear characteristics exhibit weaker correlations with other variables ($r \lesssim 0.5$), suggesting partially independent sources of variability. These patterns indicate that a large fraction of the dataset variance is shared across a subset of morphologically related features, motivating dimensionality reduction and underlying the dominance of the first principal component.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{PearsonCorrelationMatrix.png}
-\caption{Pearson correlation matrix of the nine cytological features in the Breast Cancer Wisconsin (Original) dataset. Strong correlations among size- and shape-related features indicate a substantial redundancy in the ordinal feature space and motivate dimensionality reduction.}
+\caption{Pearson correlation matrix of the nine cytological features in the Breast Cancer Wisconsin (Original) dataset, showing strong size- and shape-related dependencies that motivate dimensionality reduction.}
 \label{fig:correlation}
 \end{figure}
 
-Principal component analysis reveals a rapidly decaying eigenvalue spectrum (Fig.~\ref{fig:variance}). The first principal component accounts for approximately $65\%$ of the total variance, with the second contributing an additional $9\%$, such that the first two components together explain $74\%$ of the variance. Including a third component increases the cumulative explained variance to approximately $80\%$, with diminishing gains from higher-order components. 
-Inspection of the PCA loadings (Fig.~\ref{fig:loadings}) shows that the first component is dominated by size- and shape-related cytological features, including clump thickness and uniformity measures, while the second component receives stronger contributions from nuclear-related features such as bare nuclei and chromatin properties. This indicates that the dominant variance reflects shared morphological variation, with secondary structure associated with nuclear characteristics.
+Principal component analysis reveals a rapidly decaying eigenvalue spectrum (Fig.~\ref{fig:variance}). The first principal component accounts for approximately $65\%$ of the total variance, with the second contributing an additional $9\%$, such that the first two components together explain $74\%$ of the variance. Including a third component increases the cumulative explained variance to approximately $80\%$, with diminishing contributions from higher-order components. Inspection of the PCA loadings (Fig.~\ref{fig:loadings}) shows that PC1 is dominated by size- and shape-related features, while PC2 receives stronger contributions from nuclear-related characteristics, indicating partially independent axes of morphological variation.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{pca_variance.png}
-\caption{Individual (bars) and cumulative (points) variance explained by principal components. The first two components capture approximately $74\%$ of the total variance, increasing to $80\%$ when a third component is included, consistent with a low-dimensional structure.}
+\caption{Individual (bars) and cumulative (points) variance explained by principal components, showing that the first two PCs capture $74\%$ of the total variance, rising to $80\%$ with the inclusion of a third, consistent with a low-dimensional structure.}
 \label{fig:variance}
 \end{figure}
-Projection of tumour samples onto the first two principal components reveals partial separation between benign and malignant classes (Fig.~\ref{fig:kmeans}). Although substantial overlap remains, the two diagnostic groups occupy systematically different regions of the reduced feature space, with separation occurring primarily along the first principal component. This demonstrates that unsupervised dimensionality reduction alone recovers diagnostically relevant structure from correlated cytological features, despite the absence of class labels during training.
+Projection of tumour samples onto the first two principal components reveals partial separation between benign and malignant classes (Fig.~\ref{fig:kmeans}), with separation occurring primarily along PC1. Clustering in this reduced space yields two dominant groupings whose centroids are displaced along the axis associated with size- and shape-related features, consistent with the interpretation of PC1 as a global morphological variation axis. Despite the absence of supervision, the resulting cluster assignments show strong quantitative agreement with diagnostic labels, yielding an adjusted Rand index of $\mathrm{ARI}=0.84$.
 
-
-Clustering performed in the space of the first two principal components yields two dominant groupings separated predominantly along PC1 (Fig.~\ref{fig:kmeans}). The inferred cluster centroids are displaced along the axis associated with size- and shape-related cytological features, consistent with the interpretation of PC1 as a morphological variation axis. Despite the absence of supervision, the resulting cluster assignments show strong quantitative agreement with diagnostic labels, yielding an adjusted Rand index of $\mathrm{ARI} = 0.84$.
-
+Although clustering achieves strong agreement, substantial overlap remains, particularly for samples near the decision boundary. Misclassified tumours predominantly exhibit intermediate morphological characteristics, suggesting intrinsic biological ambiguity and measurement noise rather than algorithmic failure. Clustering performance remains high across PCA representations of varying dimensionality, with adjusted Rand indices ranging from 0.83 to 0.86 (Table~\ref{tab:ari}). Strong agreement is already achieved using only the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions, indicating that diagnostically relevant structure is captured by a small number of correlated feature combinations.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.49\linewidth]{pca_loadings_pc1.png}
 \hfill
 \includegraphics[width=0.49\linewidth]{pca_loadings_pc2.png}
-\caption{Feature loadings for the first (top) and second (bottom) principal components. PC1 is dominated by size- and shape-related cytological features, while PC2 receives stronger contributions from nuclear-related features, indicating partially independent sources of variability.}
+\caption{Feature loadings for the first (left) and second (right) principal components. While PC1 is dominated by size- and shape-related cytological features, PC2 shows stronger contributions from nuclear-related features, reflecting distinct sources of biological variability. The sign of each loading value indicates the direction of feature contribution along the principal component axis, while its magnitude reflects relative importance.}
 \label{fig:loadings}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{K-means_pca.png}
-\caption{$K$-means clustering of tumour samples in the space of the first two principal components. Points are coloured by inferred cluster assignment, and crosses denote cluster centroids. Diagnostic labels are shown for visualisation only.}
+\caption{$K$-means clustering of tumour samples projected onto the first two PCs. Points are coloured by computed cluster assignment, with crosses indicating cluster centroids. Diagnostic labels are shown for visualisation only and were not used during clustering.}
 \label{fig:kmeans}
 \end{figure}
 \begin{table}[t]
@@ -115,7 +111,7 @@ ARI & 0.847 & 0.847 & 0.847 & 0.836 \\
 \end{ruledtabular}
 \end{table}
 
-Clustering performance remained high across PCA representations of varying dimensionality, with adjusted Rand indices ranging from 0.83 to 0.86 (Table~\ref{tab:ari}). Strong agreement is already achieved using only the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions. This suggests that the dominant morphological structure relevant to tumour classification is captured by a small number of correlated feature combinations. 
+Clustering performance remained high across PCA representations of varying dimensionality, adjusted Rand indices ranging from 0.836 to 0.847 (Table~\ref{tab:ari}). Strong agreement is already acheived using the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions. This suggests that the dominant morphological structure relevant to tumour classification is captured by a small number of correlated feature combinations. 
 
 \section{Conclusion}
 We have shown that unsupervised analysis of breast cancer cytological data reveals a low-dimensional structure that aligns closely with pathological distinctions between benign and malignant tumours. Principal component analysis identifies dominant variance directions driven by correlated size- and shape-related features, capturing the majority of variability in the dataset. Clustering in this reduced representation recovers two principal groupings that show strong agreement with diagnostic labels, despite the absence of supervision.

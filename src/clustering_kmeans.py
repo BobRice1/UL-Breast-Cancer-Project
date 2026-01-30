@@ -8,7 +8,7 @@ from pca_analysis import run_pca
 
 
 # Compute squared Euclidean distances between data points and centroids
-def _squared_distances(data: np.ndarray, centroids: np.ndarray) -> np.ndarray:
+def squared_distances(data: np.ndarray, centroids: np.ndarray) -> np.ndarray:
 
     # Returns a (n_samples, n_centroids) array of squared distances
     return ((data[:, None, :] - centroids[None, :, :]) ** 2).sum(axis=2)
@@ -97,7 +97,7 @@ def kmeans_single_run(
     # K-means main loop
     prev_inertia = None
     for it in range(1, max_iters + 1):
-        d2 = _squared_distances(data, centroids)
+        d2 = squared_distances(data, centroids)
         clusters = np.argmin(d2, axis=1)
         inertia = float(np.min(d2, axis=1).sum())
 

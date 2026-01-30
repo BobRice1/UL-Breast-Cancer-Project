@@ -16,7 +16,7 @@
 \affiliation{School of Physics and Astronomy, University of Nottingham, UK}
 
 \begin{abstract}
-Unsupervised learning methods provide a principled framework for uncovering latent structure in biomedical data without reliance on diagnostic labels. We analyse the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by $k$-means clustering to assess whether benign and malignant tumours exhibit intrinsic separation based on cytological feature statistics alone. Correlation analysis reveals strong dependencies among size- and shape-related features, motivating dimensionality reduction. PCA shows that the first two components capture approximately $74\%$ of the total variance ($80\%$ with three components), reflecting a low-dimensional structure dominated by shared morphological variation. Clustering in this reduced representation yields strong alignment between unsupervised clusters and diagnostic labels, achieving an adjusted Rand index of $0.84$. Agreement with labels was assessed, post hoc. Although substantial overlap remains, these results demonstrate that correlated cytological features encode diagnostically relevant information, highlighting the utility of simple unsupervised approaches for exploratory structure discovery in biomedical data.
+Unsupervised learning methods provide a principled framework for uncovering latent structure in biomedical data without reliance on diagnostic labels. We analyse the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by $k$-means clustering to assess whether benign and malignant tumours exhibit intrinsic separation based on cytological feature statistics alone. Correlation analysis reveals strong dependencies among size- and shape-related features, motivating dimensionality reduction. PCA shows that the first two components capture approximately $74\%$ of the total variance ($80\%$ with three components), reflecting a low-dimensional structure dominated by shared morphological variation. Clustering in this reduced space yields strong alignment with diagnostic labels (adjusted Rand index of $0.84$). Agreement with labels was assessed, \textit{post hoc}. Despite substantial overlap, correlated cytological features encode diagnostically relevant structure.
 \end{abstract}
 
 \maketitle
@@ -31,36 +31,36 @@ Here, we apply unsupervised learning methods to the Breast Cancer Wisconsin (Ori
 \section{Methods}
 \paragraph{Dataset and preprocessing:} We analysed the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} from the UCI Machine Learning Repository, consisting of 699 cytology samples annotated as benign or malignant. Each sample is described by nine ordinal-valued features capturing graded assessments of cell size, shape, adhesion, nuclear properties, and mitotic activity derived from fine needle aspirates. Samples containing missing values were removed prior to analysis, and diagnostic labels were retained solely for post-hoc evaluation and visualisation, not for training. All features were standardised to zero mean and unit variance using the sample standard deviation (N-1 normalisation) prior to analysis.
 \paragraph{Correlation analysis:} To characterise dependencies among cytological features, we computed the Pearson correlation matrix
-\begin{equation}
+{\scriptsize\begin{equation}
     r_{jk} = \frac{\sum_{i=1}^{N} (x_{ij} - \bar{x}_j)(x_{ik} - \bar{x}_k)}
     {\sqrt{\sum_{i=1}^{N}(x_{ij} - \bar{x}_j)^2 \,\sum_{i=1}^{N}(x_{ik} - \bar{x}_k)^2}}.
-\end{equation}
+\end{equation}}
 where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Strong inter-feature correlations, quantified using Pearson coefficients to capture linear dependencies, were used to assess feature redundancy and motivate subsequent application of PCA.
 \paragraph{Principal component analysis:} Dimensionality reduction was performed using PCA fit to the standardised feature matrix without access to diagnostic labels. PCA was chosen due to its interpretability and its ability to identify dominant correlated directions in linear feature spaces. Following standardisation to zero mean and unit variance, the sample covariance matrix
-\begin{equation}
+{\scriptsize\begin{equation}
 \Sigma = \frac{1}{N-1} X^{\mathsf{T}} X ,
-\end{equation}
+\end{equation}}
 was diagonalised by solving the eigenvalue problem
-\begin{equation}
+{\scriptsize\begin{equation}
 \Sigma \mathbf{v}_{\ell} = \lambda_{\ell} \mathbf{v}_{\ell}, 
-\end{equation}
+\end{equation}}
 where $\lambda_{\ell}$ and $\mathbf{v}_{\ell}$ denote the eigenvalues and corresponding eigenvectors, ordered such that $\lambda_{1} \geq \lambda_{2} \geq \dots$. Each standardised data point $\mathbf{x}_i$ was projected onto the first $K$ principal components via
-\begin{equation}
+{\scriptsize\begin{equation}
 \mathbf{z}_i = V_K^{\mathsf{T}} \mathbf{x}_i ,
-\end{equation}
+\end{equation}}
 where $V_K = [\mathbf{v}_1, \dots, \mathbf{v}_K]$. The number of retained components was selected based on the cumulative explained variance and inspection of the eigenvalue spectrum.
 \paragraph{Unsupervised clustering:} Clustering was performed in the reduced PCA space using the $k$-means algorithm.
-\begin{equation}
+{\scriptsize\begin{equation}
 \mathcal{L} = \sum_{i=1}^{N} \min_{k} \left\lVert \mathbf{z}_i - \boldsymbol{\mu}_k \right\rVert^{2}.
-\end{equation}
+\end{equation}}
 Given cluster centroids $\boldsymbol{\mu}_k$, sample assignments were obtained by minimising the sum of squared distances to the nearest centroid. The number of clusters was fixed to $k=2$, and because $k$-means is sensitive to initial centroid placement and can converge to local minima, we used $k$-means++ initialisation with $30$ random restarts (fixed seed) and retained the minimum-inertia solution.
 
-\paragraph{Evaluation:}Clustering performance was assessed post hoc using the adjusted Rand index (ARI), 
-\begin{equation}
+\paragraph{Evaluation:}Clustering performance was assessed \textit{post hoc} using the adjusted Rand index (ARI), 
+{\scriptsize\begin{equation}
 \mathrm{ARI} =
 \frac{\mathrm{RI} - \mathbb{E}[\mathrm{RI}]}
 {\max(\mathrm{RI}) - \mathbb{E}[\mathrm{RI}]},
-\end{equation}
+\end{equation}}
 which quantifies agreement between inferred cluster assignments and reference diagnostic labels while correcting for chance. An ARI value close to unity indicates strong agreement.
 
 \section{Results}
@@ -111,7 +111,7 @@ ARI & 0.847 & 0.847 & 0.847 & 0.836 \\
 \end{ruledtabular}
 \end{table}
 
-Clustering performance remained high across PCA representations of varying dimensionality, adjusted Rand indices ranging from 0.836 to 0.847 (Table~\ref{tab:ari}). Strong agreement is already acheived using the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions. This suggests that the dominant morphological structure relevant to tumour classification is captured by a small number of correlated feature combinations. 
+Clustering performance remained high across PCA representations of varying dimensionality, adjusted Rand indices ranging from 0.836 to 0.847 (Table~\ref{tab:ari}). Strong agreement is already achieved using the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions. This suggests that the dominant morphological structure relevant to tumour classification is captured by a small number of correlated feature combinations. 
 
 \section{Conclusion}
 We have shown that unsupervised analysis of breast cancer cytological data reveals a low-dimensional structure that aligns closely with pathological distinctions between benign and malignant tumours. Principal component analysis identifies dominant variance directions driven by correlated size- and shape-related features, capturing the majority of variability in the dataset. Clustering in this reduced representation recovers two principal groupings that show strong agreement with diagnostic labels, despite the absence of supervision.

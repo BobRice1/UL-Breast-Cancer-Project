@@ -11,10 +11,8 @@
 
 \small
 
-\title{Low-Dimensional Structure in Breast Cancer Cytology Revealed by Unsupervised Learning%
-\thanks{All figures were generated using custom Python code written by the authors.
-The full analysis and figure-generation pipeline is available at
-\url{https://github.com/BOBRICE1/UL-BREAST-CANCER-PROJECT}.}}
+\title{Low-Dimensional Structure in Breast Cancer Cytology Revealed by Unsupervised Learning}
+
 
 \author{Gillian Macdonald}
 
@@ -30,11 +28,8 @@ Unsupervised learning provides a principled framework for uncovering the latent 
 
 \section{Introduction}
 Breast cancer diagnosis relies on quantitative analysis of cytological morphology, where systematic differences in cell size, shape, and nuclear properties are indicative of malignancy ~\cite{Wolberg1990}. Advances in digital cytology enable multivariate tumour feature extraction, motivating data-driven exploration of cellular structure beyond individual measurements ~\cite{Street1993}.
-
 Despite high diagnostic accuracy of supervised methods, unsupervised analysis remains important for understanding intrinsic tumour structure and interpretability. Accordingly, such approaches provide complementary insight into whether clinically relevant structure emerges directly from feature-space regularities. PCA allows the identification of dominant directions of shared variance among correlated features~\cite{Jolliffe2002}. Moreover, clustering of reduced representations reveals intrinsic groupings and enables unsupervised comparison with diagnostic categories ~\cite{MacQueen1967}.
-
 Here, we apply unsupervised learning methods to the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} to test whether benign and malignant tumours occupy distinct regions in cytological feature space. We show that correlated cytological features induce a low-dimensional structure in which the two diagnostic classes are partially separable, even without label information. Importantly, dominant variance axes principal component one (PC1) and two (PC2) capture clinically meaningful morphological distinctions, demonstrating the value of simple unsupervised methods for biomedical structure discovery.
-
 We hypothesise that intrinsic correlations among cytological features induce a low-dimensional structure that partially separates benign and malignant tumours without supervision. 
 
 \section{Methods}
@@ -97,9 +92,9 @@ Projection of tumour samples onto the first two principal components reveals par
 Although clustering achieves strong agreement, substantial overlap remains, particularly for samples near the decision boundary. Misclassified tumours predominantly exhibit intermediate morphological characteristics, suggesting intrinsic biological ambiguity and measurement noise rather than algorithmic failure. Clustering performance remains high across PCA representations of varying dimensionality, with adjusted Rand indices ranging from 0.83 to 0.86 (Table~\ref{tab:ari}). Strong agreement is already achieved using only the first two principal components, with only modest and non-monotonic variation upon inclusion of additional dimensions, indicating that diagnostically relevant structure is captured by a small number of correlated feature combinations.
 \begin{figure}[t]
 \centering
-\includegraphics[width=1.0\linewidth]{pca_loadings_pc1.png}
+\includegraphics[width=0.7\linewidth]{pca_loadings_pc1.png}
 \hfill
-\includegraphics[width=1.0\linewidth]{pca_loadings_pc2.png}
+\includegraphics[width=0.7\linewidth]{pca_loadings_pc2.png}
 \caption{Feature loadings for the first (top) and second (bottom) principal components. While PC1 is dominated by size- and shape-related cytological features, PC2 shows stronger contributions from nuclear-related features, reflecting distinct sources of biological variability. The sign of each loading value indicates the direction of feature contribution along the principal component axis, while its magnitude reflects relative importance.}
 \label{fig:loadings}
 \end{figure}

@@ -86,7 +86,6 @@ def print_loadings(loadings_df: pd.DataFrame, pc: str = "PC1", top_n: int = 5) -
     print(top_negative.to_string())
 
 
-
 def plot_loadings_bar(
     loadings_df: pd.DataFrame,
     pc: str = "PC1",
@@ -97,7 +96,7 @@ def plot_loadings_bar(
     title_fontsize: int = 18,
     x_axis_label_fontsize: int = 18,
     y_axis_label_fontsize: int = 18,
-    feature_tick_fontsize: int = 18,
+    feature_tick_fontsize: int = 14,
 ) -> None:
 
     # Select loadings for the specified principal component
@@ -123,7 +122,7 @@ def plot_loadings_bar(
     plt.ylabel("Features", fontsize=y_axis_label_fontsize)
 
     plt.tick_params(axis="y", labelsize=feature_tick_fontsize)
-    plt.tick_params(axis="x", labelsize=feature_tick_fontsize)
+    plt.tick_params(axis="x", labelsize=14)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.show()

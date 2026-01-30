@@ -102,7 +102,7 @@ def plot_loadings_bar(
     # Select and sort these features for plotting
     s = s.loc[top_features].sort_values()
 
-    plt.figure(figsize=(5, 3))
+    plt.figure(figsize=(9, 5))
     plt.barh(s.index, s.values, alpha=0.8)  # bar plot
     plt.title(f"Feature Loadings for {pc}")
     plt.xlabel("Loading Value")
@@ -129,7 +129,7 @@ def plot_prob_of_variance(
     # Number of components
     n_components = len(eigenvalues_sorted)
 
-    fig, ax = plt.subplots(figsize=(5, 3))
+    fig, ax = plt.subplots(figsize=(6, 4))
 
     # Individual variance (bars) in percentage
     ax.bar(
@@ -183,7 +183,7 @@ def plot_pca_scatter(
     pca_scores: np.ndarray, y: np.ndarray, output_path: str = "Figures/pca_scatter.png"
 ) -> None:
 
-    plt.figure(figsize=(6, 5))
+    plt.figure(figsize=(6, 4))
     benign_mask = y == 0
     malignant_mask = y == 1
 

@@ -255,7 +255,7 @@ cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters_b
 
 # Plot the clustered data with centroids
 custom_palette = {"Benign": "blue", "Malignant": "red"}
-plt.figure(figsize=(6, 4))
+plt.figure(figsize=(8, 5))
 sns.scatterplot(
     x=pca_scores_best[:, 0],
     y=pca_scores_best[:, 1],

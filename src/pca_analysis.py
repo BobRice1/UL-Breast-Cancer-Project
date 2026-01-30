@@ -94,10 +94,10 @@ def plot_loadings_bar(
     output_path: str = "Figures/pca_loadings_pc1.png",
     label_map: dict[str, str] | None = None,
     format_feature_labels: bool = True,
-    title_fontsize: int = 22,
-    x_axis_label_fontsize: int = 22,
-    y_axis_label_fontsize: int = 22,
-    feature_tick_fontsize: int = 22,
+    title_fontsize: int = 18,
+    x_axis_label_fontsize: int = 18,
+    y_axis_label_fontsize: int = 18,
+    feature_tick_fontsize: int = 18,
 ) -> None:
 
     # Select loadings for the specified principal component
@@ -123,6 +123,7 @@ def plot_loadings_bar(
     plt.ylabel("Features", fontsize=y_axis_label_fontsize)
 
     plt.tick_params(axis="y", labelsize=feature_tick_fontsize)
+    plt.tick_params(axis="x", labelsize=feature_tick_fontsize)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.show()
@@ -183,9 +184,9 @@ def plot_prob_of_variance(
             fontsize=10,
         )
 
-    ax.set_xlabel("Principal Component")
-    ax.set_ylabel("Explained Variance (%)")
-    ax.set_title("Proportion of Variance")
+    ax.set_xlabel("Principal Component", fontsize=15)
+    ax.set_ylabel("Explained Variance (%)", fontsize=15)
+    ax.set_title("Proportion of Variance", fontsize=18)
     ax.set_xticks(range(1, n_components + 1))
     ax.set_ylim(0, 100)
     ax.legend()

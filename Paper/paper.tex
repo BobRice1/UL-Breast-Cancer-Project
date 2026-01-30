@@ -19,7 +19,7 @@
 \affiliation{School of Physics and Astronomy, University of Nottingham, UK}
 
 \begin{abstract}
-Unsupervised learning provides a principled framework for uncovering latent structure in biomedical data without reliance on diagnostic labels. We analyse the Breast Cancer Wisconsin (Original) dataset~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by $k$-means clustering to assess whether benign and malignant tumours exhibit intrinsic separation based solely on cytological feature statistics. Strong correlations among size- and shape-related features motivate dimensionality reduction, with the first two principal components capturing approximately $74\%$ of the total variance ($80\%$ with three components), indicating a low-dimensional structure dominated by shared morphological variation. Clustering in this reduced space shows strong agreement with diagnostic labels (adjusted Rand index $0.84$), assessed \textit{post hoc}. Despite substantial overlap between classes, diagnostically relevant structure is encoded in correlated cytological features.
+Unsupervised learning provides a principled framework for uncovering the latent structure in biomedical data independently of externally imposed diagnostic labels. In this paper, we analyse cytological measurements from the Breast Cancer Wisconsin (Original) dataset using principal component analysis (PCA) followed by k-means clustering to assess whether differences in pathological structure of benign and malignant tumours emerges directly from feature correlations alone. We find that strong correlations among size- and shape-related features induce a pronounced low-dimensional structure, with the first two principal components (PCs) capturing approximately 74\% of the total variance (80\% with three components), reflecting coordinated morphological variation rather than independent measurements. Clustering in this reduced space, evaluated post hoc, shows strong agreement with diagnostic labels (adjusted Rand index 0.84), despite the absence of supervision. Importantly, the observed partial separation and substantial class overlap highlight the continuous and heterogeneous nature of tumour morphology, demonstrating that clinically relevant information is embedded in the statistical organisation of cytological features rather than isolated variables.
 \end{abstract}
 
 \maketitle
@@ -105,7 +105,7 @@ Although clustering achieves strong agreement, substantial overlap remains, part
 \end{figure}
 \begin{table}[t]
 \centering
-\caption{Adjusted Rand Index (ARI) between $k$-means cluster assignments and diagnostic labels as a function of the number of retained principal components. For each configuration, the reported ARI corresponds to the solution with minimum inertia over 30 random initialisations using $k$-means++ initialisation and a fixed random seed. ARI is reported post hoc for evaulation only and was not used to select the number of retained PCs}
+\caption{Adjusted Rand Index (ARI) between $k$-means cluster assignments and diagnostic labels as a function of the number of retained principal components. For each configuration, the reported ARI corresponds to the solution with minimum inertia over 30 random initialisations using $k$-means++ initialisation and a fixed random seed. ARI is reported \textit{post hoc} for evaulation only and was not used to select the number of retained PCs}
 \label{tab:ari}
 \begin{ruledtabular}
 \begin{tabular}{ccccc}

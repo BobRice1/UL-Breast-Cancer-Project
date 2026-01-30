@@ -86,17 +86,18 @@ def print_loadings(loadings_df: pd.DataFrame, pc: str = "PC1", top_n: int = 5) -
     print(top_negative.to_string())
 
 
-# Bar plot to visualise most important feature loadings for a given principal component
+
 def plot_loadings_bar(
     loadings_df: pd.DataFrame,
     pc: str = "PC1",
     top_n: int = 8,
     output_path: str = "Figures/pca_loadings_pc1.png",
     label_map: dict[str, str] | None = None,
-    prettify_labels: bool = True,
-    title_fontsize: int = 12,
-    y_axis_label_fontsize: int | None = None,
-    feature_tick_fontsize: int = 18,
+    format_feature_labels: bool = True,
+    title_fontsize: int = 22,
+    x_axis_label_fontsize: int = 22,
+    y_axis_label_fontsize: int = 22,
+    feature_tick_fontsize: int = 22,
 ) -> None:
 
     # Select loadings for the specified principal component
@@ -108,19 +109,18 @@ def plot_loadings_bar(
     s = s.loc[top_features].sort_values()
 
     plt.figure(figsize=(9, 5))
-    y_labels = list(s.index)
+    raw_labels = list(s.index)
     if label_map is not None:
-        y_labels = [label_map.get(name, name) for name in y_labels]
-    elif prettify_labels:
-        y_labels = [str(name).replace("_", " ") for name in y_labels]
+        y_labels = [label_map.get(str(name), str(name)) for name in raw_labels]
+    elif format_feature_labels:
+        y_labels = [str(name).replace("_", " ") for name in raw_labels]
+    else:
+        y_labels = [str(name) for name in raw_labels]
 
     plt.barh(y_labels, s.values, alpha=0.8)  # bar plot
     plt.title(f"Feature Loadings for {pc}", fontsize=title_fontsize)
-    plt.xlabel("Loading Value")
-    if y_axis_label_fontsize is None:
-        plt.ylabel("Features")
-    else:
-        plt.ylabel("Features", fontsize=y_axis_label_fontsize)
+    plt.xlabel("Loading Value", fontsize=x_axis_label_fontsize)
+    plt.ylabel("Features", fontsize=y_axis_label_fontsize)
 
     plt.tick_params(axis="y", labelsize=feature_tick_fontsize)
     plt.tight_layout()

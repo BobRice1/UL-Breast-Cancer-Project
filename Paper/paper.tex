@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{hyperref}
 \graphicspath{{../Figures/}}
 
 \raggedbottom
@@ -10,7 +11,10 @@
 
 \small
 
-\title{Low-Dimensional Structure in Breast Cancer Cytology Revealed by Unsupervised Learning}
+\title{Low-Dimensional Structure in Breast Cancer Cytology Revealed by Unsupervised Learning%
+\thanks{All figures were generated using custom Python code written by the authors.
+The full analysis and figure-generation pipeline is available at
+\url{https://github.com/BOBRICE1/UL-BREAST-CANCER-PROJECT}.}}
 
 \author{Gillian Macdonald}
 
@@ -19,7 +23,7 @@
 \affiliation{School of Physics and Astronomy, University of Nottingham, UK}
 
 \begin{abstract}
-Unsupervised learning provides a principled framework for uncovering the latent structure in biomedical data independently of externally imposed diagnostic labels. In this paper, we analyse cytological measurements from the Breast Cancer Wisconsin (Original) dataset using principal component analysis (PCA) followed by k-means clustering to assess whether differences in pathological structure of benign and malignant tumours emerges directly from feature correlations alone. We find that strong correlations among size- and shape-related features induce a pronounced low-dimensional structure, with the first two principal components (PCs) capturing approximately 74\% of the total variance (80\% with three components), reflecting coordinated morphological variation rather than independent measurements. Clustering in this reduced space, evaluated post hoc, shows strong agreement with diagnostic labels (adjusted Rand index 0.84), despite the absence of supervision. Importantly, the observed partial separation and substantial class overlap highlight the continuous and heterogeneous nature of tumour morphology, demonstrating that clinically relevant information is embedded in the statistical organisation of cytological features rather than isolated variables.
+Unsupervised learning provides a principled framework for uncovering the latent structure in biomedical data independently of externally imposed diagnostic labels. In this paper, we analyse cytological measurements from the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by k-means clustering to assess whether differences in pathological structure of benign and malignant tumours emerges directly from feature correlations alone. We find that strong correlations among size- and shape-related features induce a pronounced low-dimensional structure, with the first two principal components (PCs) capturing approximately 74\% of the total variance (80\% with three components), reflecting coordinated morphological variation rather than independent measurements. Clustering in this reduced space, evaluated post hoc, shows strong agreement with diagnostic labels (adjusted Rand index 0.84), despite the absence of supervision. Importantly, the observed partial separation and substantial class overlap highlight the continuous and heterogeneous nature of tumour morphology, demonstrating that clinically relevant information is embedded in the statistical organisation of cytological features rather than isolated variables.
 \end{abstract}
 
 \maketitle
@@ -34,13 +38,16 @@ Here, we apply unsupervised learning methods to the Breast Cancer Wisconsin (Ori
 We hypothesise that intrinsic correlations among cytological features induce a low-dimensional structure that partially separates benign and malignant tumours without supervision. 
 
 \section{Methods}
+
 \paragraph{Dataset and preprocessing:} We analysed the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} from the UCI Machine Learning Repository, consisting of 699 cytology samples annotated as benign or malignant. Each sample is described by nine ordinal-valued features capturing graded assessments of cell size, shape, adhesion, nuclear properties, and mitotic activity derived from fine needle aspirates. Samples containing missing values were removed prior to analysis, leaving N = 683 samples, and diagnostic labels were retained solely for \textit{post hoc} evaluation and visualisation. All features were standardised to zero mean and unit variance using the sample standard deviation (N-1 normalisation) prior to analysis. Although features are ordinal, treating them as approximately interval-scaled is standard for this dataset.
+
 \paragraph{Correlation analysis:} To characterise dependencies among cytological features, we computed the Pearson correlation matrix
 \begin{equation}
     r_{jk} = \frac{\sum_{i=1}^{N} (x_{ij} - \bar{x}_j)(x_{ik} - \bar{x}_k)}
     {\sqrt{\sum_{i=1}^{N}(x_{ij} - \bar{x}_j)^2 \,\sum_{i=1}^{N}(x_{ik} - \bar{x}_k)^2}}.
 \end{equation}
 where $x_{ij}$ denotes the value of feature $j$ for sample $i$ and $\bar{x}_j$ is the corresponding feature mean. Pearson correlation coefficients were used to characterise linear dependencies among approximately interval-scaled features. Strong inter-feature correlations were used to assess feature redundancy and motivate subsequent application of PCA. 
+
 \paragraph{Principal component analysis:} Dimensionality reduction was performed using PCA fit to the standardised feature matrix without access to diagnostic labels. PCA was chosen due to its interpretability and its ability to identify dominant correlated directions in linear feature spaces. Following standardisation to zero mean and unit variance, the sample covariance matrix
 \begin{equation}
 \Sigma = \frac{1}{N-1} X^{\mathsf{T}} X ,

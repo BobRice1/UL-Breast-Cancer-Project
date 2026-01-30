@@ -30,7 +30,6 @@ columns = [
 df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
 update_df = df.drop(columns=["Sample_ID", "Class"])
 
-# Prettify feature names for plotting (remove underscores)
 update_df = update_df.rename(columns=lambda c: c.replace("_", " "))
 
 # Compute correlation matrix

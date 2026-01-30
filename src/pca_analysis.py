@@ -12,7 +12,7 @@ from data_loading import load_breast_cancer_data  # adjust import path if needed
 def standardise_features(feature_matrix: np.ndarray) -> np.ndarray:
     # Standardisation: (X - mean) / std
     means = feature_matrix.mean(axis=0)
-    stds = feature_matrix.std(axis=0, ddof=1)  # population std;
+    stds = feature_matrix.std(axis=0, ddof=1)
     # Avoid division by zero just in case
     stds[stds == 0] = 1.0
     standardised_features = (feature_matrix - means) / stds

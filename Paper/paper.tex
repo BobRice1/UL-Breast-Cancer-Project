@@ -11,12 +11,9 @@
 
 \small
 
-<<<<<<< HEAD
 \title{Low-Dimensional Structure in Breast Cancer Cytology Revealed by Unsupervised Learning}
 
 
-=======
->>>>>>> 24138abc7f0c40ef77d271084d54f89846fc8a42
 \author{Gillian Macdonald}
 \author{Lenka Okasova}
 \author{Bob Rice}
@@ -26,7 +23,7 @@ The full analysis and figure-generation pipeline is available at
 \affiliation{School of Physics and Astronomy, University of Nottingham, UK}
 
 \begin{abstract}
-Unsupervised learning provides a principled framework for uncovering the latent structure in biomedical data independently of externally imposed diagnostic labels. In this paper, we analyse cytological measurements from the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by k-means clustering to assess whether differences in pathological structure of benign and malignant tumours emerges directly from feature correlations alone. We find that strong correlations among size- and shape-related features induce a pronounced low-dimensional structure, with the first two principal components (PCs) capturing approximately 74\% of the total variance (80\% with three components), reflecting coordinated morphological variation rather than independent measurements. Clustering in this reduced space, evaluated post hoc, shows strong agreement with diagnostic labels (adjusted Rand index 0.84), despite the absence of supervision. Importantly, the observed partial separation and substantial class overlap highlight the continuous and heterogeneous nature of tumour morphology, demonstrating that clinically relevant information is embedded in the statistical organisation of cytological features rather than isolated variables.
+Unsupervised learning provides a principled framework for uncovering the latent structure in biomedical data independently of externally imposed diagnostic labels. In this paper, we analyse cytological measurements from the Breast Cancer Wisconsin (Original) dataset ~\cite{Wolberg1990Dataset} using principal component analysis (PCA) followed by k-means clustering to assess whether differences in pathological structure of benign and malignant tumours emerge directly from feature correlations alone. We find that strong correlations among size- and shape-related features induce a pronounced low-dimensional structure, with the first two principal components (PCs) capturing approximately 74\% of the total variance (80\% with three components), reflecting coordinated morphological variation rather than independent variables. Clustering in this reduced space, evaluated post hoc, shows strong agreement with diagnostic labels (adjusted Rand index 0.84), despite the absence of supervision. Importantly, the observed partial separation and substantial class overlap highlight the continuous and heterogeneous nature of tumour morphology, demonstrating that clinically relevant information is embedded in the statistical organisation of cytological features rather than isolated variables.
 \end{abstract}
 
 \maketitle
@@ -89,7 +86,7 @@ Principal component analysis reveals a rapidly decaying eigenvalue spectrum (Fig
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{pca_variance.png}
-\caption{Individual (bars) and cumulative (points) variance explained by principal components, showing that the first two PCs capture $74\%$ of the total variance, rising to $80\%$ with the inclusion of a third, consistent with a low-dimensional structure.}
+\caption{Individual (bars) and cumulative (points) variance explained by principal components, showing that the first two PCs capture $74\%$ of the total variance ($80\%$ with the inclusion of a third), consistent with a low-dimensional structure.}
 \label{fig:variance}
 \end{figure}
 Projection of tumour samples onto the first two principal components reveals partial separation between benign and malignant classes (Fig.~\ref{fig:kmeans}), with separation occurring primarily along PC1. Clustering in this reduced space yields two dominant groupings whose centroids are displaced along the axis associated with size- and shape-related features, consistent with the interpretation of PC1 as a global morphological variation axis. Despite the absence of supervision, the resulting cluster assignments show strong quantitative agreement with diagnostic labels, yielding an adjusted Rand index of $\mathrm{ARI}=0.84$ in \textit{post hoc} comparison.
@@ -100,19 +97,19 @@ Although clustering achieves strong agreement, substantial overlap remains, part
 \includegraphics[width=0.7\linewidth]{pca_loadings_pc1.png}
 \hfill
 \includegraphics[width=0.7\linewidth]{pca_loadings_pc2.png}
-\caption{Feature loadings for the first (top) and second (bottom) principal components. While PC1 is dominated by size- and shape-related cytological features, PC2 shows stronger contributions from nuclear-related features, reflecting distinct sources of biological variability. The sign of each loading value indicates the direction of feature contribution along the principal component axis, while its magnitude reflects relative importance.}
+\caption{Feature loadings for the first (top) and second (bottom) principal components. PC1 is dominated by size- and shape-related features, while PC2 shows stronger contributions from nuclear-related characteristics, reflecting distinct sources of biological variability. The sign of each loading value indicates the direction of feature contribution along the principal component axis, while its magnitude reflects relative importance.}
 \label{fig:loadings}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{K-means_pca.png}
-\caption{$K$-means clustering of tumour samples projected onto the first two PCs. Points are coloured by computed cluster assignment, with crosses indicating cluster centroids. Diagnostic labels are shown for visualisation only and were not used during clustering.}
+\caption{$K$-means clustering of tumour samples projected onto the first two PCs. Points are coloured by computed cluster assignment, with crosses indicating cluster centroids. Diagnostic labels are shown for visualisation only and were not used during clustering. Separation occurs primarily along the dominant variance axis (PC1), with substantial class overlap.}
 \label{fig:kmeans}
 \end{figure}
 \begin{table}[t]
 \centering
-\caption{Adjusted Rand Index (ARI) between $k$-means cluster assignments and diagnostic labels as a function of the number of retained principal components. For each configuration, the reported ARI corresponds to the solution with minimum inertia over 30 random initialisations using $k$-means++ initialisation and a fixed random seed. ARI is reported \textit{post hoc} for evaluation only and was not used to select the number of retained PCs.}
+\caption{Adjusted Rand Index (ARI) between $k$-means cluster assignments and diagnostic labels as a function of the number of retained principal components. ARI is reported for the minimum-inertia solution over 30 $k$-means++ initialisations and used solely for \textit{post hoc} evaluation.}
 \label{tab:ari}
 \begin{ruledtabular}
 \begin{tabular}{ccccc}
@@ -124,9 +121,8 @@ ARI & 0.847 & 0.847 & 0.847 & 0.836 \\
 \end{table}
 
 \section{Conclusion}
-We have shown that unsupervised analysis of breast cancer cytological data reveals a low-dimensional structure that aligns closely with pathological distinctions between benign and malignant tumours. Principal component analysis identifies dominant variance directions driven by correlated size- and shape-related features, capturing the majority of variability in the dataset. Clustering in this reduced representation recovers two principal groupings that show strong agreement with diagnostic labels, despite the absence of supervision.
-The saturation of clustering performance at low dimensionality is consistent with the rapid decay of the PCA eigenvalue spectrum, indicating that diagnostically relevant structure is governed primarily by shared morphological variation. Although substantial overlap between classes remains, reflecting biological variability and measurement noise, the observed partial separation demonstrates that key pathological information is encoded directly in the statistical organisation of cytological features. These results highlight the utility of simple unsupervised pipelines for exploratory structure discovery in biomedical datasets when labels are limited or uncertain.
-Future work could explore alternative unsupervised models, such as hierarchical or mixture-based clustering, to further characterise structure in this feature space.
+We have shown that unsupervised analysis of breast cancer cytological data reveals a pronounced low-dimensional structure that aligns closely with pathological distinctions between benign and malignant tumours. Principal component analysis identifies dominant variance directions driven primarily by correlated size- and shape-related features, capturing the majority of variability in the dataset. The emergence of strong agreement between unsupervised cluster assignments and diagnostic labels indicates that clinically relevant information is encoded directly in the statistical organisation of cytological features, rather than imposed by supervised decision rules.
+Importantly, the observed partial separation and persistent overlap between classes suggest that tumour morphology varies continuously along shared latent axes, with diagnostic labels defining discrete categories within a continuous morphological distribution. Misclassified samples predominantly occupy intermediate regions of feature space, consistent with biological heterogeneity and measurement uncertainty rather than algorithmic failure. This analysis is limited by the linear nature of PCA and the treatment of ordinal features as approximately continuous, which may obscure nonlinear structure or finer-grained subgroups. Nevertheless, these assumptions are sufficient to reveal the dominant structure of the data. Future work could explore nonlinear or mixture-based unsupervised models to further characterise morphological heterogeneity and transitional tumour phenotypes.
 
 
 \begin{thebibliography}{9}

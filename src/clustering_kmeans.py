@@ -218,7 +218,6 @@ for n_comp in component_list:
     )
 
     ari = adjusted_rand_score(y, clusters)
-    ari_results[n_comp] = ari
 
     print(
         f"n_components={n_comp:>2} ARI={ari:.3f} inertia={inertia:.1f} iters={n_iters}"

@@ -1,4 +1,4 @@
-# Data loading utilities for the Breast Cancer Wisconsin datasett
+# Data loading utilities for the Breast Cancer Wisconsin dataset
 
 import numpy as np
 import pandas as pd

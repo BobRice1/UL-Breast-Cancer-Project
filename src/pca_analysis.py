@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd  # just for type hints / convenience
 
 # Import the shared data loading function
-from data_loading import load_breast_cancer_data  # adjust import path if needed
+from data_loading import load_breast_cancer_data
 
 
 # Standardise features to zero mean and unit variance
@@ -13,7 +13,6 @@ def standardise_features(feature_matrix: np.ndarray) -> np.ndarray:
     # Standardisation: (X - mean) / std
     means = feature_matrix.mean(axis=0)
     stds = feature_matrix.std(axis=0, ddof=1)
-    # Avoid division by zero just in case
     stds[stds == 0] = 1.0
     standardised_features = (feature_matrix - means) / stds
     return standardised_features
@@ -91,40 +90,28 @@ def plot_loadings_bar(
     pc: str = "PC1",
     top_n: int = 8,
     output_path: str = "Figures/pca_loadings_pc1.png",
-    label_map: dict[str, str] | None = None,
-    format_feature_labels: bool = True,
     title_fontsize: int = 18,
     x_axis_label_fontsize: int = 18,
     y_axis_label_fontsize: int = 18,
     feature_tick_fontsize: int = 14,
-) -> None:
-
+):
     # Select loadings for the specified principal component
     s = loadings_df[pc].copy()
-
     # Get top_n features by absolute loading value
     top_features = s.abs().sort_values(ascending=False).head(top_n).index
     # Select and sort these features for plotting
     s = s.loc[top_features].sort_values()
 
+    labels = [name.replace("_", " ") for name in s.index]
     plt.figure(figsize=(9, 5))
-    raw_labels = list(s.index)
-    if label_map is not None:
-        y_labels = [label_map.get(str(name), str(name)) for name in raw_labels]
-    elif format_feature_labels:
-        y_labels = [str(name).replace("_", " ") for name in raw_labels]
-    else:
-        y_labels = [str(name) for name in raw_labels]
-
-    plt.barh(y_labels, s.values, alpha=0.8)  # bar plot
+    plt.barh(labels, s.values, alpha=0.8)  # bar plot
     plt.title(f"Feature Loadings for {pc}", fontsize=title_fontsize)
     plt.xlabel("Loading Value", fontsize=x_axis_label_fontsize)
     plt.ylabel("Features", fontsize=y_axis_label_fontsize)
-
     plt.tick_params(axis="y", labelsize=feature_tick_fontsize)
     plt.tick_params(axis="x", labelsize=14)
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path, dpi=600, bbox_inches="tight")
     plt.show()
 
 
@@ -190,7 +177,7 @@ def plot_prob_of_variance(
     ax.set_ylim(0, 100)
     ax.legend()
     fig.tight_layout()
-    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    fig.savefig(output_path, dpi=600, bbox_inches="tight")
     plt.show()
 
 
@@ -225,13 +212,13 @@ def plot_pca_scatter(
     plt.title("Principal Component Analysis: PC1 vs PC2")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path, dpi=600, bbox_inches="tight")
     plt.show()
 
 
 # Scree plot of eigenvalues with elbow marked at PC2
 def plot_scree(
-    eigenvalues_sorted: np.ndarray, output_path: str = "Figures/pca_scree.png"
+    eigenvalues_sorted: np.ndarray, output_path: str = "Figures/pca_scree.png", dpi=600
 ) -> None:
 
     n_components = len(eigenvalues_sorted)
@@ -266,7 +253,7 @@ def plot_scree(
     )
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path, dpi=600, bbox_inches="tight")
     plt.show()
 
 
@@ -305,19 +292,19 @@ def main() -> None:
     print_loadings(loadings_df, pc="PC2", top_n=5)
 
     plot_loadings_bar(
-        loadings_df, pc="PC1", top_n=8, output_path="Figures/pca_loadings_pc1.png"
+        loadings_df, pc="PC1", top_n=8, output_path="Figures/pca_loadings_pc1.png", dpi=600
     )
     plot_loadings_bar(
-        loadings_df, pc="PC2", top_n=8, output_path="Figures/pca_loadings_pc2.png"
+        loadings_df, pc="PC2", top_n=8, output_path="Figures/pca_loadings_pc2.png", dpi=600
     )
 
 
 if __name__ == "__main__":
     main()
 
+
+
 # Helper function - used in clustering script
-
-
 def run_pca(filepath: str, n_components: int = 2):
 
     # Load data

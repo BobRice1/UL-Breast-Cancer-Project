@@ -2,8 +2,6 @@
 # Data source: Breast Cancer Wisconsin dataset.
 
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import seaborn as sns
 
 from data_loading import load_breast_cancer_data
@@ -12,20 +10,6 @@ from data_loading import load_breast_cancer_data
 plt.style.use("default")
 sns.set_style("whitegrid")
 
-# Load and clean data
-columns = [
-    "Sample_ID",
-    "Clump_Thickness",
-    "Uniformity_Cell_Size",
-    "Uniformity_Cell_Shape",
-    "Marginal_Adhesion",
-    "Single_Epithelial_Cell_Size",
-    "Bare_Nuclei",
-    "Bland_Chromatin",
-    "Normal_Nucleoli",
-    "Mitoses",
-    "Class",
-]
 
 df = load_breast_cancer_data("Data/breast-cancer-wisconsin.data")
 update_df = df.drop(columns=["Sample_ID", "Class"])
@@ -52,5 +36,5 @@ sns.heatmap(
 plt.title("Pearson Correlation Matrix", pad=15)
 
 plt.tight_layout()
-plt.savefig("Figures/PearsonCorrelationMatrix.png", dpi=300, bbox_inches="tight")
+plt.savefig("Figures/PearsonCorrelationMatrix.png", dpi=600, bbox_inches="tight")
 plt.show()

@@ -196,7 +196,6 @@ INIT_METHOD = "kmeans++"  # 'kmeans++' or 'random'
 N_FEATURES = 9
 component_list = [2, 3, 5, N_FEATURES]
 
-ari_results = {}
 best = {
     "n_components": None,
     "ari": -np.inf,
@@ -269,5 +268,5 @@ plt.ylabel("PC2", fontsize=16)
 plt.tick_params(axis="y", labelsize=14)
 plt.tick_params(axis="x", labelsize=14)
 plt.tight_layout()
-plt.savefig("Figures/K-means_pca.png", dpi=300, bbox_inches="tight")
+plt.savefig("Figures/K-means_pca.png", dpi=600, bbox_inches="tight")
 plt.show()

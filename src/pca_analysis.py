@@ -292,10 +292,10 @@ def main() -> None:
     print_loadings(loadings_df, pc="PC2", top_n=5)
 
     plot_loadings_bar(
-        loadings_df, pc="PC1", top_n=8, output_path="Figures/pca_loadings_pc1.png", dpi=600
+        loadings_df, pc="PC1", top_n=8, output_path="Figures/pca_loadings_pc1.png"
     )
     plot_loadings_bar(
-        loadings_df, pc="PC2", top_n=8, output_path="Figures/pca_loadings_pc2.png", dpi=600
+        loadings_df, pc="PC2", top_n=8, output_path="Figures/pca_loadings_pc2.png"
     )
 
 

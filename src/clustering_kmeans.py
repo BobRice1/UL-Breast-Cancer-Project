@@ -184,83 +184,74 @@ def adjusted_rand_score(true_labels, cluster_labels):
     return ari
 
 
-# assign k based on elbow method in pca_analysis.py, 2 optimal as 2 tumour classes present
-k = 2
+# assign k based on diagnostic categories in dataset
+K = 2
+DATA_PATH = "Data/breast-cancer-wisconsin.data"
 
 # k-means configuration (for reproducibility + robustness)
 RANDOM_STATE = 0
 N_INIT = 30
 INIT_METHOD = "kmeans++"  # 'kmeans++' or 'random'
 
-# ARI over multiple PCA component counts
+# PCA dimensionality (labels used only post hoc for ARI + visualisation)
+N_COMPONENTS_FOR_CLUSTERING = 2
+
+# ARI over multiple PCA component counts (post hoc sensitivity analysis only)
 N_FEATURES = 9
 component_list = [2, 3, 5, N_FEATURES]
 
-best = {
-    "n_components": None,
-    "ari": -np.inf,
-    "centroids": None,
-    "clusters": None,
-    "scores": None,
-    "inertia": None,
-    "n_iters": None,
-}
-
+ari_results = {}
 for n_comp in component_list:
-    pca_scores, y = run_pca("Data/breast-cancer-wisconsin.data", n_components=n_comp)
+    pca_scores, y = run_pca(DATA_PATH, n_components=n_comp)
 
     centroids, clusters, inertia, n_iters = kmeans(
         pca_scores,
-        k,
+        K,
         n_init=N_INIT,
         random_state=RANDOM_STATE,
         init=INIT_METHOD,
     )
 
     ari = adjusted_rand_score(y, clusters)
+    ari_results[n_comp] = ari
 
     print(
         f"n_components={n_comp:>2} ARI={ari:.3f} inertia={inertia:.1f} iters={n_iters}"
     )
-    if ari > best["ari"]:
-        best.update(
-            {
-                "n_components": n_comp,
-                "ari": ari,
-                "centroids": centroids,
-                "clusters": clusters,
-                "scores": pca_scores,
-                "inertia": inertia,
-                "n_iters": n_iters,
-            }
-        )
 
-print(f"\nBest ARI={best['ari']:.3f} at n_components={best['n_components']}")
-
-# Use the best result for plotting
-pca_scores_best = best["scores"]
-clusters_best = best["clusters"]
-centroids_best = best["centroids"]
+pca_scores_plot, y = run_pca(DATA_PATH, n_components=N_COMPONENTS_FOR_CLUSTERING)
+centroids_plot, clusters_plot, inertia_plot, n_iters_plot = kmeans(
+    pca_scores_plot,
+    K,
+    n_init=N_INIT,
+    random_state=RANDOM_STATE,
+    init=INIT_METHOD,
+)
+ari_plot = adjusted_rand_score(y, clusters_plot)
+print(
+    f"\nPlotting n_components={N_COMPONENTS_FOR_CLUSTERING} "
+    f"ARI={ari_plot:.3f} inertia={inertia_plot:.1f} iters={n_iters_plot}"
+)
 
 # Map cluster IDs to true labels for visualization - from 0 and 1 to Benign and Malignant
 cluster_to_label = {}
-for cid in np.unique(clusters_best):
-    majority_true = np.bincount(y[clusters_best == cid]).argmax()
+for cid in np.unique(clusters_plot):
+    majority_true = np.bincount(y[clusters_plot == cid]).argmax()
     cluster_to_label[cid] = majority_true
 
 label_to_name = {0: "Benign", 1: "Malignant"}
-cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters_best])
+cluster_names = np.array([label_to_name[cluster_to_label[c]] for c in clusters_plot])
 
 # Plot the clustered data with centroids
 custom_palette = {"Benign": "blue", "Malignant": "red"}
 plt.figure(figsize=(8, 5))
 sns.scatterplot(
-    x=pca_scores_best[:, 0],
-    y=pca_scores_best[:, 1],
+    x=pca_scores_plot[:, 0],
+    y=pca_scores_plot[:, 1],
     hue=cluster_names,
     palette=custom_palette,
 )
-plt.scatter(centroids_best[:, 0], centroids_best[:, 1], s=300, c="black", marker="X")
+plt.scatter(centroids_plot[:, 0], centroids_plot[:, 1], s=300, c="black", marker="X")
 plt.title("K-Means Clustering on PCA-Reduced Data", fontsize=18)
 plt.xlabel("PC1", fontsize=16)
 plt.ylabel("PC2", fontsize=16)
